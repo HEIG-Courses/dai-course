@@ -6,24 +6,27 @@
 # for org creation): https://github.com/organizations/plan
 # Everything after that is automated here:
 #   1. fork the upstream course repo into the org
-#   2. enable Actions on the fork (disabled by default on forks)
-#   3. enable GitHub Pages (built by the publish workflow)
-#   4. trigger the first site build
+#   2. rename the fork to <org>.github.io so the site serves at the root
+#      URL (https://<org>.github.io/) instead of /dai-course/
+#   3. enable Actions on the fork (disabled by default on forks)
+#   4. enable GitHub Pages (built by the publish workflow)
+#   5. trigger the first site build
 #
 # Usage: ./new-year.sh <org> [upstream]
-#   e.g. ./new-year.sh heig-vd-dai-2027
+#   e.g. ./new-year.sh heigvd-dai-27
 
 set -euo pipefail
 
 UPSTREAM="${2:-HEIG-Courses/dai-course}"
-REPO_NAME="${UPSTREAM#*/}"
+UPSTREAM_NAME="${UPSTREAM#*/}"
 
 if [[ $# -lt 1 ]]; then
   echo "Usage: $0 <org> [upstream (default: $UPSTREAM)]" >&2
   exit 1
 fi
 ORG="$1"
-FORK="$ORG/$REPO_NAME"
+SITE_REPO="${ORG}.github.io"
+FORK="$ORG/$SITE_REPO"
 
 echo "==> Checking gh authentication"
 gh auth status >/dev/null
@@ -34,16 +37,17 @@ if ! gh api "orgs/$ORG" --jq .login >/dev/null 2>&1; then
   exit 1
 fi
 
-echo "==> Forking $UPSTREAM into $ORG"
+echo "==> Forking $UPSTREAM into $ORG (as $SITE_REPO)"
 if gh api "repos/$FORK" --jq .full_name >/dev/null 2>&1; then
   echo "    $FORK already exists, skipping fork"
 else
   gh repo fork "$UPSTREAM" --org "$ORG" --clone=false --default-branch-only
   # The fork is created asynchronously; wait until it is queryable
   for _ in $(seq 1 30); do
-    gh api "repos/$FORK" --jq .full_name >/dev/null 2>&1 && break
+    gh api "repos/$ORG/$UPSTREAM_NAME" --jq .full_name >/dev/null 2>&1 && break
     sleep 2
   done
+  gh api -X PATCH "repos/$ORG/$UPSTREAM_NAME" -f name="$SITE_REPO" >/dev/null
 fi
 
 echo "==> Enabling Actions on the fork"
@@ -63,9 +67,8 @@ if ! gh workflow run publish.yml -R "$FORK" 2>/dev/null; then
   echo "    gh workflow run publish.yml -R $FORK"
 fi
 
-SITE_URL="https://${ORG}.github.io/${REPO_NAME}/"
 echo
-echo "Done. Site will be at: $SITE_URL"
+echo "Done. Site will be at: https://${SITE_REPO}/"
 echo
 echo "Manual checklist:"
 echo "  [ ] Invite co-teacher(s) to the org (owner role)"

@@ -31,7 +31,8 @@ The site is rendered and deployed to GitHub Pages by
 ## Yearly lifecycle
 
 1. Create the semester org manually (no API for this): `heigvd-dai-<yy>`.
-2. `tools/new-year.sh heigvd-dai-<yy>` — forks this repo into the org,
+2. `tools/new-year.sh heigvd-dai-<yy>` — forks this repo into the org as
+   `<org>.github.io` (so the site serves at `https://<org>.github.io/`),
    enables Actions and Pages, triggers the first build.
 3. During the semester: fix in the fork; contribute back regularly with
    `tools/sync.sh push heigvd-dai-<yy>`; pull upstream improvements with
