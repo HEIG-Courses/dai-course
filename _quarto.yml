@@ -1,0 +1,28 @@
+project:
+  type: website
+  output-dir: _site
+
+website:
+  title: "DAI — Développement d'applications internet"
+  page-navigation: true
+  search: true
+  sidebar:
+    style: docked
+    logo: assets/heig-vd.svg
+    contents:
+      - index.qmd
+      - section: "Chapters"
+        contents:
+          - chapters/05-docker.qmd
+  page-footer:
+    center: |
+      Based on the [HEIG-VD DAI course](https://github.com/heig-vd-dai-course/heig-vd-dai-course)
+      by L. Delafontaine and H. Louis — [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/)
+
+format:
+  html:
+    theme: [litera, assets/dai.scss]
+    toc: true
+    toc-depth: 3
+    code-copy: true
+    link-external-newwindow: true
