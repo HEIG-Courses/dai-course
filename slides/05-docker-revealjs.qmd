@@ -1,14 +1,6 @@
 ---
 title: "Docker and Docker Compose"
 subtitle: "DAI — Chapter 05"
-format:
-  revealjs:
-    theme: [default, ../assets/dai-slides.scss]
-    logo: ../assets/heig-vd.svg
-    slide-number: true
-    transition: none
-    footer: "HEIG-VD · DAI 2026–2027 · CC BY-SA 4.0"
-    center-title-slide: true
 ---
 
 ## Objectives
