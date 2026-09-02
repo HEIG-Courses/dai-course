@@ -17,6 +17,25 @@ Estimated time: 1–2 hours on Windows (WSL setup included), ~30 minutes on
 macOS or Linux.
 :::
 
+## macOS only: install Homebrew
+
+::: {.callout-note}
+On **Windows**, skip to [Install WSL](#windows-only-install-wsl); on
+**Linux**, skip to [Terminal basics](#terminal-basics) — `apt` already
+covers this.
+:::
+
+[Homebrew](https://brew.sh) is the de-facto package manager for macOS —
+the equivalent of Ubuntu's `apt`: it installs, updates and removes
+developer tools cleanly. You will use it to install the course tooling
+(starting with Git below).
+
+Install it by following the instructions on <https://brew.sh> (one
+command), and **follow the "Next steps" the installer prints** at the end
+— they add `brew` to your shell's PATH.
+
+**Verification**: open a new terminal; `brew --version` prints a version.
+
 ## Windows only: install WSL
 
 ::: {.callout-note}
@@ -149,24 +168,6 @@ Add-MpPreference -ExclusionPath '\\wsl.localhost\Ubuntu-<your-version>'
   (`shutdown /r /fw` in an administrator PowerShell) and enable
   "Virtualization" / "VT-x" / "AMD-V".
 :::
-
-## macOS only: install Homebrew
-
-::: {.callout-note}
-On **Windows (WSL)** or **Linux**, skip this section — `apt` already
-covers it.
-:::
-
-[Homebrew](https://brew.sh) is the de-facto package manager for macOS —
-the equivalent of Ubuntu's `apt`: it installs, updates and removes
-developer tools cleanly. You will use it to install the course tooling
-(starting with Git below).
-
-Install it by following the instructions on <https://brew.sh> (one
-command), and **follow the "Next steps" the installer prints** at the end
-— they add `brew` to your shell's PATH.
-
-**Verification**: open a new terminal; `brew --version` prints a version.
 
 ## Terminal basics
 
