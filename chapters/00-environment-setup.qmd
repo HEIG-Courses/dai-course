@@ -95,8 +95,17 @@ Close and reopen Windows Terminal: it should drop you into Ubuntu.
 
 ### Where your files live
 
-Your Ubuntu home directory (`~`) is where **all your projects go**. It is
-reachable from Windows at `\\wsl.localhost\Ubuntu-<version>\home\<user>`:
+When you open the Ubuntu terminal, you land in the **home directory** of
+your Ubuntu user, located under `/home` and usually written `~` — the `~`
+symbol is a shorthand for your home directory. This is where **all your
+projects go**.
+
+The two worlds can see each other:
+
+- From Ubuntu, your Windows drives are mounted under `/mnt` — e.g.
+  `C:\Users` is `/mnt/c/Users`.
+- From Windows, your Ubuntu home is reachable in the File Explorer at
+  `\\wsl.localhost\Ubuntu-<version>\home\<user>`:
 
 ![](images/00-environment-setup/wsl-file-browser-ubuntu.png){width="70%"}
 
