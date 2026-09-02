@@ -15,6 +15,10 @@ website:
         contents:
           - href: chapters/00-environment-setup.qmd
             text: "00 · Environment setup"
+          - href: chapters/01-introduction.qmd
+            text: "01 · Introduction"
+          - href: chapters/02-git-github.qmd
+            text: "02 · Git & GitHub"
           - href: chapters/05-docker.qmd
             text: "05 · Docker & Compose"
       - section: "Practical work"
