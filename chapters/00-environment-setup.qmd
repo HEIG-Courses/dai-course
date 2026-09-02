@@ -158,7 +158,10 @@ mkdir <dir>           # create a directory
 rm <file>  /  rm -r <dir>   # remove a file / a directory
 cp <src> <dst>        # copy (add -r for directories)
 mv <src> <dst>        # move or rename
-cat <file>  /  less <file>  # print / page through a file
+cat <file>            # print the content of a file
+less <file>  /  more <file>  # page through a file (q to quit)
+tail <file>           # print the last lines (-f to follow live, e.g. logs)
+exit                  # exit the terminal session
 ```
 
 **Verification**: create a directory, create a file in it, list it, delete
