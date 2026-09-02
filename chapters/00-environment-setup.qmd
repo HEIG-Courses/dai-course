@@ -70,6 +70,16 @@ Finally, update Ubuntu from its terminal:
 sudo apt update && sudo apt upgrade
 ```
 
+::: {.callout-tip title="What did I just type?"}
+- `sudo` runs a command with superuser privileges — Linux asks for
+  **your** password (typed invisibly) before allowing it. That is why
+  installs and system updates start with it.
+- `apt` is Ubuntu's **package manager**: it installs, updates and removes
+  software from a curated catalog — `apt update` refreshes the catalog,
+  `apt upgrade` updates your installed packages. You will use it all
+  semester. (Windows has equivalents — see [Go further](#go-further).)
+:::
+
 ### Make Ubuntu your default terminal
 
 Install [Windows Terminal](https://www.microsoft.com/p/windows-terminal/9n0dx20hk701)
