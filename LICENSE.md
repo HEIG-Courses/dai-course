@@ -9,7 +9,7 @@ It is adapted from the
 by Ludovic Delafontaine and Hadrien Louis (itself after the work of
 Olivier Liechti and Jürgen Ehrensberger), licensed under CC BY-SA 4.0.
 
-This adaptation is by Olivier Tischhauser, with the help of
+This version: Olivier Tischhauser, with the help of
 [Claude](https://claude.com) (Anthropic).
 
 You are free to share and adapt this material, provided you give
