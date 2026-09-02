@@ -93,6 +93,12 @@ set:
 
 Close and reopen Windows Terminal: it should drop you into Ubuntu.
 
+::: {.callout-tip}
+You can still open a PowerShell tab anytime via the **down arrow** in the
+title bar — and holding `Ctrl` while selecting *Windows PowerShell* opens
+it **as administrator**. You will need that for the next steps.
+:::
+
 ### Where your files live
 
 When you open the Ubuntu terminal, you land in the **home directory** of
