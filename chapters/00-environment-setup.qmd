@@ -150,6 +150,24 @@ Add-MpPreference -ExclusionPath '\\wsl.localhost\Ubuntu-<your-version>'
   "Virtualization" / "VT-x" / "AMD-V".
 :::
 
+## macOS only: install Homebrew
+
+::: {.callout-note}
+On **Windows (WSL)** or **Linux**, skip this section — `apt` already
+covers it.
+:::
+
+[Homebrew](https://brew.sh) is the de-facto package manager for macOS —
+the equivalent of Ubuntu's `apt`: it installs, updates and removes
+developer tools cleanly. You will use it to install the course tooling
+(starting with Git below).
+
+Install it by following the instructions on <https://brew.sh> (one
+command), and **follow the "Next steps" the installer prints** at the end
+— they add `brew` to your shell's PATH.
+
+**Verification**: open a new terminal; `brew --version` prints a version.
+
 ## Terminal basics
 
 You will live in the terminal this semester. Make sure these commands feel
@@ -189,8 +207,9 @@ sudo apt install git
 ### macOS
 
 ```sh
-# Installs the Apple command-line tools, which include Git
-xcode-select --install
+# Via Homebrew — macOS ships a Git with the Apple developer tools, but
+# it is usually several versions behind; prefer Homebrew's up-to-date one
+brew install git
 ```
 
 :::
@@ -295,6 +314,7 @@ You are ready for the first course when every line passes:
 |-------|------------------|
 | Unix terminal available | Windows: Windows Terminal opens Ubuntu · macOS/Linux: any terminal |
 | Basic commands mastered | create/list/delete files and directories without the mouse |
+| Package manager | Ubuntu/WSL: `apt --version` · macOS: `brew --version` |
 | Git installed and configured | `git --version` · `git config user.name` prints your name |
 | GitHub account | you can log in on github.com |
 | SDKMAN! | `sdk version` |
