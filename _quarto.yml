@@ -13,6 +13,7 @@ website:
       - index.qmd
       - section: "Chapters"
         contents:
+          - chapters/00-environment-setup.qmd
           - chapters/05-docker.qmd
       - section: "Practical work"
         contents:
