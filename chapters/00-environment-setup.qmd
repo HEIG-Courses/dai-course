@@ -305,6 +305,8 @@ wsl --manage Ubuntu --set-sparse true
 
 ## Sources
 
+- Adapted and maintained by O. Tischhauser, with the help of
+  [Claude](https://claude.com) (Anthropic).
 - Adapted from the
   [HEIG-VD DAI course](https://github.com/heig-vd-dai-course/heig-vd-dai-course)
   by L. Delafontaine and H. Louis, licensed
