@@ -28,6 +28,7 @@ website:
 format:
   html:
     theme: [litera, assets/dai.scss]
+    lightbox: true
     toc: true
     toc-depth: 3
     code-copy: true
