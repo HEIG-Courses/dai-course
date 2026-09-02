@@ -48,10 +48,11 @@ Restart your computer, then in an administrator PowerShell again:
 wsl --update --web-download
 wsl --set-default-version 2
 
-# List available distributions, then install the LATEST Ubuntu version
-# shown in YOUR list (do not install the unversioned "Ubuntu" entry)
+# List available distributions, then install the latest Ubuntu LTS
+# version shown in YOUR list (marked "LTS", e.g. Ubuntu-26.04 — use the
+# versioned entry, not the unversioned "Ubuntu" one)
 wsl --list --online
-wsl --install --distribution Ubuntu-<latest-version>
+wsl --install --distribution Ubuntu-<latest-LTS-version>
 ```
 
 You will be asked to create a username and password for Ubuntu (we suggest
