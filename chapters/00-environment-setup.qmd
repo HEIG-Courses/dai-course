@@ -196,7 +196,7 @@ with `sudo apt install <package>` and retry.
 Then install the latest LTS Java (Temurin distribution) and Maven:
 
 ```sh
-# Find the latest LTS Temurin version (21.x.y-tem at the time of writing)
+# Find the latest LTS Temurin version (25.x.y-tem at the time of writing)
 sdk list java
 
 # Install it (replace with the identifier from YOUR list)
@@ -210,7 +210,7 @@ sdk install maven
 
 ```sh
 sdk version       # prints the SDKMAN! version
-java --version    # prints Temurin 21 (or newer LTS)
+java --version    # prints Temurin 25 (or newer LTS)
 mvn --version     # prints Maven, running on that Java
 ```
 
@@ -231,11 +231,8 @@ Allow IntelliJ to reach WSL through the Windows Firewall — in an
 administrator PowerShell:
 
 ```powershell
-# Windows 11
+# Allow WSL through the firewall
 New-NetFirewallRule -DisplayName "WSL" -Direction Inbound -InterfaceAlias "vEthernet (WSL (Hyper-V firewall))" -Action Allow
-
-# Windows 10 (instead of the above)
-New-NetFirewallRule -DisplayName "WSL" -Direction Inbound -InterfaceAlias "vEthernet (WSL)" -Action Allow
 
 # Refresh IntelliJ's own firewall rules
 Get-NetFirewallProfile -Name Public | Get-NetFirewallRule | where DisplayName -ILike "IntelliJ IDEA*" | Disable-NetFirewallRule
@@ -258,7 +255,7 @@ exclusion from the WSL section — it is a
 :::
 
 **Verification**: create a throwaway project in IntelliJ — it detects your
-Java 21 installation (on Windows: from WSL), and its terminal opens your
+Java 25 installation (on Windows: from WSL), and its terminal opens your
 Unix shell.
 
 ## Final checklist
@@ -272,7 +269,7 @@ You are ready for the first course when every line passes:
 | Git installed and configured | `git --version` · `git config user.name` prints your name |
 | GitHub account | you can log in on github.com |
 | SDKMAN! | `sdk version` |
-| Java LTS | `java --version` shows Temurin 21+ |
+| Java LTS | `java --version` shows Temurin 25+ |
 | Maven | `mvn --version` |
 | IntelliJ IDEA | new project detects Java (Windows: from WSL) |
 
