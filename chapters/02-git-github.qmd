@@ -406,7 +406,7 @@ Version control: Subversion, Mercurial. Forges:
 
 - O. Tischhauser, with the help of
   [Claude](https://claude.com) (Anthropic).
-- Adapted from the
+- Based on the
   [HEIG-VD DAI course](https://github.com/heig-vd-dai-course/heig-vd-dai-course)
   by L. Delafontaine and H. Louis, licensed
   [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/).
