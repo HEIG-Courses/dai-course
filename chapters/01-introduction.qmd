@@ -8,16 +8,22 @@ Welcome to **Développement d'applications internet (DAI)**!
 ## What this course is about
 
 The Internet runs on programs talking to each other. In this course you
-will learn to build them — from both ends and everything in between:
+will learn to build them:
 
-- **Network programming** — design and implement client–server
-  applications with the Socket API (TCP and UDP).
-- **HTTP** — understand the protocol powering the web, build an HTTP API,
-  and deploy a real infrastructure with a reverse proxy behind a domain
-  name.
-- **Email protocols** — understand SMTP and implement a simple mail
-  client.
-- **File transfer and remote access** — SSH, SCP and friends.
+- **Network programming** (inputs/outputs, encodings, TCP and UDP) —
+  write client–server applications with the Socket API, from the bytes
+  up.
+- **Application-level protocols** (SMTP, SSH, HTTP… and your own) —
+  understand the protocols the Internet runs on, then design one
+  yourself.
+- **Web infrastructures** (reverse proxy, load balancer, sticky
+  sessions) — deploy your applications the way they run in production.
+- **Reading and writing technical documentation** — the skill behind all
+  the others: specifications, READMEs, and the reports you will write.
+
+At the end of the course, you will be able to create applications that
+communicate over the network — business applications, APIs, games,
+anything.
 
 Along the way you will adopt the tools of professional software
 development: Git and GitHub, Docker, Maven, the terminal — the same
