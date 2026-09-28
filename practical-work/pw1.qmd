@@ -83,9 +83,8 @@ Why is the `ç` not in the output? You know the answer since
 
 ## Groups
 
-You work in **groups of 3**. Pairs are allowed if the numbers do not
-work out. If you have no group, come and see us and we will find you
-one.
+You work in **pairs**. Groups of 3 are allowed if you ask us first. If
+you have no group, come and see us and we will find you one.
 
 To announce your group, open a **GitHub Discussion** in the
 [course organization]({{< var discussions-url >}}), category *Show and

@@ -9,7 +9,7 @@ subtitle: "DAI · A file processing CLI"
   [picocli](https://picocli.info/).
 - It reads **one file**, processes it, and writes **another file**.
 - **You choose what it does.** Text, images, audio, encryption, metadata…
-- In **groups of 3** (pairs allowed), over 4 sessions, then a
+- In **pairs** (groups of 3 on request), over 4 sessions, then a
   presentation.
 
 ## Why this project
@@ -51,7 +51,7 @@ You know why the `ç` is lost.
 
 ## Groups and idea
 
-- **Groups of 3.** Pairs allowed. No group? Come and see us.
+- **Pairs.** Groups of 3 if you ask us first. No group? Come and see us.
 - Open a **GitHub Discussion** today, category *Show and tell*:
   - title: `[DAI {{< var year >}} Class <A or C>] PW1 - <names>`,
   - description: a few lines on what your CLI will do.
