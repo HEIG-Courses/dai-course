@@ -128,13 +128,6 @@ Read it **before** you start, not the evening before the deadline.
 [Practical work 1](../practical-work/pw1.qmd) has everything: milestones,
 dates, the full grid.
 
-## Finished? Was it easy? Was it hard?
-
-Tell us what was easy and what was difficult. It helps us improve the
-course and come back to you when needed.
-
-GitHub Discussions. Reactions welcome!
-
 ## Credits
 
 ::: {style="font-size: 0.7em"}

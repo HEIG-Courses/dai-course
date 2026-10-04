@@ -491,13 +491,6 @@ Then: [practical work 1](../practical-work/pw1.qmd).
 
 **Do not hesitate to help each other! There's no need to rush!**
 
-## Finished? Was it easy? Was it hard?
-
-Let us know what was easy and what was difficult. It helps us improve
-the course and come back to you when needed.
-
-GitHub Discussions. Reactions welcome!
-
 ## Credits
 
 ::: {style="font-size: 0.7em"}

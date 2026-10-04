@@ -1,0 +1,90 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1060 360" font-family="Helvetica, Arial, sans-serif">
+  <title>Docker lifecycle: build an image, run it locally, push it to a registry, pull the same image elsewhere and run it</title>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#445"/>
+    </marker>
+    <style>
+      .src   { fill: #ffffff; stroke: #445; stroke-width: 1.5; }
+      .img   { fill: #e6eef9; stroke: #3b5b8c; stroke-width: 1.5; }
+      .reg   { fill: #fbf0dc; stroke: #9a6a17; stroke-width: 1.5; }
+      .run   { fill: #e8f4ea; stroke: #2e7d46; stroke-width: 1.5; }
+      .tb    { font-size: 15px; font-weight: bold; fill: #222; }
+      .t     { font-size: 13px; fill: #444; }
+      .tag   { font-family: Menlo, Consolas, monospace; font-size: 13px; fill: #3b5b8c; }
+      .cmd   { font-family: Menlo, Consolas, monospace; font-size: 13px; fill: #3b5b8c; }
+      .note  { font-size: 12px; fill: #666; font-style: italic; }
+      .edge  { stroke: #445; stroke-width: 1.5; fill: none; marker-end: url(#a); }
+      .machine { fill: none; stroke: #bbb; stroke-width: 1.2; stroke-dasharray: 5 4; }
+      .ico   { fill: none; stroke: #445; stroke-width: 1.6; }
+    </style>
+  </defs>
+
+  <!-- rebuild loop, above everything -->
+  <path d="M380,118 V64 H106 V118" class="edge"/>
+  <text x="243" y="54" text-anchor="middle" class="note">code changed? build again, and push again</text>
+
+  <!-- machines -->
+  <rect x="8" y="86" width="552" height="212" rx="8" class="machine"/>
+  <text x="22" y="106" class="note">your machine</text>
+  <rect x="800" y="86" width="252" height="212" rx="8" class="machine"/>
+  <text x="814" y="106" class="note">another machine</text>
+
+  <!-- source -->
+  <rect x="26" y="118" width="160" height="76" rx="6" class="src"/>
+  <path d="M42,140 h20 l10,10 v22 h-30 z" class="ico"/>
+  <path d="M62,140 v10 h10" class="ico"/>
+  <text x="128" y="152" text-anchor="middle" class="tb">source</text>
+  <text x="128" y="172" text-anchor="middle" class="t">+ Dockerfile</text>
+
+  <!-- image, local -->
+  <rect x="300" y="118" width="160" height="76" rx="6" class="img"/>
+  <path d="M318,170 v-22 l18,-10 18,10 v22 l-18,10 z" class="ico"/>
+  <path d="M318,148 l18,10 18,-10 M336,158 v22" class="ico"/>
+  <text x="400" y="150" text-anchor="middle" class="tb">image</text>
+  <text x="400" y="170" text-anchor="middle" class="tag">my-app:1.0</text>
+
+  <!-- container, local -->
+  <rect x="300" y="226" width="160" height="58" rx="6" class="run"/>
+  <rect x="318" y="241" width="28" height="26" rx="3" class="ico"/>
+  <path d="M325,241 v26 M333,241 v26 M340,241 v26" class="ico"/>
+  <text x="404" y="261" text-anchor="middle" class="tb">container</text>
+
+  <!-- registry -->
+  <rect x="610" y="118" width="150" height="76" rx="6" class="reg"/>
+  <ellipse cx="640" cy="148" rx="15" ry="6" class="ico"/>
+  <path d="M625,148 v20 a15,6 0 0 0 30,0 v-20" class="ico"/>
+  <text x="700" y="150" text-anchor="middle" class="tb">registry</text>
+  <text x="700" y="170" text-anchor="middle" class="t">ghcr.io</text>
+
+  <!-- image, pulled elsewhere -->
+  <rect x="818" y="118" width="160" height="76" rx="6" class="img"/>
+  <path d="M836,170 v-22 l18,-10 18,10 v22 l-18,10 z" class="ico"/>
+  <path d="M836,148 l18,10 18,-10 M854,158 v22" class="ico"/>
+  <text x="918" y="150" text-anchor="middle" class="tb">image</text>
+  <text x="918" y="170" text-anchor="middle" class="tag">my-app:1.0</text>
+
+  <!-- container, elsewhere -->
+  <rect x="818" y="226" width="160" height="58" rx="6" class="run"/>
+  <rect x="836" y="241" width="28" height="26" rx="3" class="ico"/>
+  <path d="M843,241 v26 M851,241 v26 M858,241 v26" class="ico"/>
+  <text x="922" y="261" text-anchor="middle" class="tb">container</text>
+
+  <!-- arrows -->
+  <path d="M188,156 H296" class="edge"/>
+  <text x="242" y="148" text-anchor="middle" class="cmd">docker build</text>
+
+  <path d="M462,156 H606" class="edge"/>
+  <text x="534" y="148" text-anchor="middle" class="cmd">docker push</text>
+
+  <path d="M762,156 H814" class="edge"/>
+  <text x="788" y="148" text-anchor="middle" class="cmd">pull</text>
+
+  <path d="M380,196 V222" class="edge"/>
+  <text x="394" y="214" class="cmd">docker run</text>
+
+  <path d="M898,196 V222" class="edge"/>
+  <text x="912" y="214" class="cmd">docker run</text>
+
+  <text x="530" y="330" text-anchor="middle" class="note">the same image, my-app:1.0, on both machines</text>
+</svg>

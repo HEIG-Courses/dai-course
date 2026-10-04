@@ -1,0 +1,257 @@
+---
+title: "Docker and Docker Compose"
+subtitle: "DAI · Chapter 05"
+---
+
+## Objectives
+
+- Tell bare metal, virtual machines and containers apart.
+- Understand images, containers and registries.
+- Package an application with a `Dockerfile`.
+- Publish an image, and run it anywhere.
+- Run several containers together with Docker Compose.
+
+## The problem
+
+- Your PW1 CLI needs Java 25 and Maven, in the right versions.
+- The next application needs Java 17, a database in version 14, a
+  library in version 2.
+- One machine, many applications, incompatible versions.
+- And each one starts in its own way: `java -jar`, `python app.py`, a
+  script, a service.
+
+## Three ways to run software
+
+- **Bare metal**: the application runs directly on the machine. Fast,
+  but every application uses what is installed there: one Java, one
+  database, one set of libraries.
+- **Virtual machine**: a whole operating system per application, with
+  its own Java and its own libraries. Isolated, but it boots like a real
+  computer.
+- **Container**: holds the application with its own Java and libraries,
+  and shares the host kernel. Starts in a fraction of a second.
+
+## Three ways to run software
+
+![](../chapters/images/05-docker/bare-metal-vm-container.svg){fig-alt="Bare metal, virtual machines and containers compared." height="560"}
+
+## What a container is
+
+- A **container** holds your application **and everything it needs to
+  run**: the right Java, the right libraries, the right tools, isolated
+  from the rest of the machine.
+- It shares the **kernel** of the host, so it is not a second computer:
+  it starts in a fraction of a second.
+- What goes in it is described in one file, the **Dockerfile**: a
+  repeatable build description, versioned with your code.
+
+## What it buys you
+
+- **One recipe**: the Dockerfile says how to build and start the
+  application.
+- **One artefact**: the image, built once, identical everywhere.
+- **One interface**: the same commands for every application, whatever
+  its language.
+
+```sh
+docker build    docker run    docker stop    docker logs
+```
+
+- You do not need the application's tools installed to run it. With a
+  multi-stage build, not even to build it.
+
+## Image, container, registry
+
+- **Image**: a read-only package, built once, never changed.
+- **Container**: a running instance of an image.
+- **Registry**: where images are stored and downloaded from.
+
+OO analogy: the image is the class, the container is the object.
+
+One image gives you as many containers as you want.
+
+## The lifecycle
+
+![](../chapters/images/05-docker/docker-lifecycle.svg){fig-alt="Source and Dockerfile, build, image, push, registry, pull, run, container." width="100%"}
+
+- An image is a **frozen build**: changing the code changes nothing
+  until you build again (and push again).
+
+## Docker
+
+- The **daemon** builds images and runs containers.
+- The **client**, `docker`, sends it orders.
+
+```sh
+docker run hello-world
+docker run --rm -it ubuntu:26.04 /bin/bash
+```
+
+- `--rm`: delete the container when it exits.
+- `-it`: connect your terminal.
+- Anything you change inside is lost: the image never changed.
+
+## The Dockerfile
+
+A text file, next to your code, with the instructions to build an image:
+
+```dockerfile
+FROM alpine:3.24
+CMD ["date"]
+```
+
+Build an image from it, then start a container:
+
+```sh
+docker build -t my-image .
+docker run --rm my-image
+```
+
+- `FROM`: the image to start from. `CMD`: what runs in the container.
+- `.` is the **build context**: the directory sent to the daemon.
+
+## Useful instructions
+
+| Instruction | What it does |
+|-------------|--------------|
+| `FROM` | the base image |
+| `WORKDIR` | the working directory |
+| `RUN` | run a command **while building** |
+| `COPY` | copy files into the image |
+| `ENTRYPOINT` | the program to start |
+| `CMD` | the default arguments |
+
+## ENTRYPOINT or CMD?
+
+- The container **is one application**: `ENTRYPOINT` for the program,
+  `CMD` for its default arguments.
+- The container **is a box with tools**: `CMD` alone, so anything can be
+  run in it.
+- `docker run my-image <args>` replaces `CMD`, never `ENTRYPOINT`.
+
+## Volumes
+
+Without a volume, what a container writes dies with it.
+
+```sh
+docker run --rm -v "$(pwd):/data" alpine:3.24 sh -c 'date > /data/date.txt'
+cat date.txt
+```
+
+- Connects a directory of your machine to one in the container.
+- The file written inside appears on your machine, and survives the
+  container.
+
+## Docker Compose
+
+- A real application is several containers: a server, a database, a
+  proxy.
+- Starting them one by one, with the right options and the right
+  network, gets tedious and error-prone.
+- **Docker Compose** describes them all in **one file**, starts them
+  with **one command**, and puts them on the **same network** so they
+  can talk to each other.
+
+## A Compose file
+
+```yaml
+services:
+  nginx:
+    image: nginx:1.30
+    ports:
+      - 8080:80
+    volumes:
+      - ./html:/usr/share/nginx/html
+```
+
+The file lives with your code, so anyone who clones your repository
+starts the whole application with one command.
+
+## Compose commands
+
+```sh
+docker compose up -d
+docker compose ps
+docker compose logs -f
+docker compose down
+```
+
+- `up` creates everything it needs, `down` removes it again.
+
+## Networks
+
+- Containers are isolated: no network, no conversation.
+- On a network, a container is reachable **by its name**, like a domain
+  name.
+
+```sh
+docker network create my-network
+docker run --network my-network --name my-server my-image
+```
+
+- Docker Compose creates a **default network** for you: every service is
+  reachable by its service name, with no command to type.
+
+## Publish to ghcr.io
+
+1. **Create a token** on GitHub: Settings > Developer settings >
+   Personal access tokens > Tokens (classic), with the scope
+   `write:packages`. Copy it, GitHub shows it once.
+2. **Log in, tag, push** (the token is the password):
+
+```sh
+docker login ghcr.io -u <username>
+docker tag my-image ghcr.io/<username>/my-image:1.0
+docker push ghcr.io/<username>/my-image:1.0
+```
+
+3. **Make the package public** in its settings on GitHub.
+
+## Why public?
+
+- A new package is **private**: only you can pull it.
+- Your teammates and we get "denied" or "not found" until you change it.
+- Package page > Package settings > Change visibility > Public.
+- Then anyone runs your application with Docker alone:
+
+```sh
+docker run --rm ghcr.io/<username>/my-image:1.0
+```
+
+## Summary
+
+- Container: the application and its dependencies, sharing the host
+  kernel.
+- `Dockerfile` then `docker build`: an image, a frozen build.
+- `docker push` to a registry, `docker pull` and `docker run` anywhere.
+- Volumes for files, networks for conversations.
+- Compose describes the whole application in one file.
+
+# Questions?
+
+# Exercises
+
+## What will you do?
+
+In `05-docker` of the [code examples]({{< var examples-url >}}):
+
+- Run, inspect and clean up a container.
+- Write your own small `Dockerfile`, and mount a volume.
+- Package the provided Java app, run it in the background.
+- Change the code: nothing changes until you rebuild.
+- Publish your image, and make it public.
+- Run two services with Compose.
+
+**Help each other, no need to rush!**
+
+## Credits
+
+::: {style="font-size: 0.7em"}
+- O. Tischhauser, with the help of
+  [Claude](https://claude.com) (Anthropic).
+- Based on the
+  [HEIG-VD DAI course](https://github.com/heig-vd-dai-course/heig-vd-dai-course)
+  by L. Delafontaine and H. Louis, licensed
+  [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/), as is
+  this deck.
+:::

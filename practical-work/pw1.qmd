@@ -393,13 +393,6 @@ Present your work as you like: slides, a live demo, a poster. But:
 Aim at someone who understands Java but has never heard of your project.
 :::
 
-## Finished? Was it easy? Was it hard?
-
-Tell us what was easy and what was difficult. It helps us improve the
-course, and helps you if something did not work.
-
-[GitHub Discussions]({{< var discussions-url >}})
-
 ## Sources
 
 - O. Tischhauser, with the help of

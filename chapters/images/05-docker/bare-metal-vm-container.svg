@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 530" font-family="Helvetica, Arial, sans-serif">
+  <title>Bare metal, virtual machines and containers compared, hardware at the bottom</title>
+  <style>
+    .hw   { fill: #e9e9ee; stroke: #666; stroke-width: 1.4; }
+    .os   { fill: #dfe6f2; stroke: #3b5b8c; stroke-width: 1.4; }
+    .guest{ fill: #f6ead6; stroke: #9a6a17; stroke-width: 1.4; }
+    .eng  { fill: #f6ead6; stroke: #9a6a17; stroke-width: 1.4; }
+    .app  { fill: #e3f1e7; stroke: #2e7d46; stroke-width: 1.4; }
+    .lbl  { font-size: 16px; fill: #222; }
+    .ttl  { font-size: 18px; font-weight: bold; fill: #222; }
+  </style>
+
+  <!-- bare metal: apps on top, hardware at the bottom -->
+  <text x="10" y="32" class="ttl">Bare metal</text>
+  <rect x="10" y="42" width="434" height="30" class="app"/>
+  <text x="227" y="63" text-anchor="middle" class="lbl">app A</text>
+  <rect x="456" y="42" width="434" height="30" class="app"/>
+  <text x="673" y="63" text-anchor="middle" class="lbl">app B</text>
+  <rect x="10" y="76" width="880" height="30" class="os"/>
+  <text x="450" y="97" text-anchor="middle" class="lbl">operating system: one Java, one set of libraries</text>
+  <rect x="10" y="110" width="880" height="30" class="hw"/>
+  <text x="450" y="131" text-anchor="middle" class="lbl">hardware</text>
+
+  <!-- virtual machines -->
+  <text x="10" y="186" class="ttl">Virtual machines</text>
+  <rect x="10" y="196" width="434" height="30" class="app"/>
+  <text x="227" y="217" text-anchor="middle" class="lbl">app A</text>
+  <rect x="456" y="196" width="434" height="30" class="app"/>
+  <text x="673" y="217" text-anchor="middle" class="lbl">app B</text>
+  <rect x="10" y="230" width="434" height="30" class="guest"/>
+  <text x="227" y="251" text-anchor="middle" class="lbl">guest operating system</text>
+  <rect x="456" y="230" width="434" height="30" class="guest"/>
+  <text x="673" y="251" text-anchor="middle" class="lbl">guest operating system</text>
+  <rect x="10" y="264" width="880" height="30" class="os"/>
+  <text x="450" y="285" text-anchor="middle" class="lbl">host operating system + hypervisor</text>
+  <rect x="10" y="298" width="880" height="30" class="hw"/>
+  <text x="450" y="319" text-anchor="middle" class="lbl">hardware</text>
+
+  <!-- containers -->
+  <text x="10" y="374" class="ttl">Containers</text>
+  <rect x="10" y="384" width="434" height="30" class="app"/>
+  <text x="227" y="405" text-anchor="middle" class="lbl">app A + its Java and libraries</text>
+  <rect x="456" y="384" width="434" height="30" class="app"/>
+  <text x="673" y="405" text-anchor="middle" class="lbl">app B + its Java and libraries</text>
+  <rect x="10" y="418" width="880" height="28" class="eng"/>
+  <text x="450" y="437" text-anchor="middle" class="lbl">container engine</text>
+  <rect x="10" y="450" width="880" height="30" class="os"/>
+  <text x="450" y="471" text-anchor="middle" class="lbl">operating system, one shared kernel</text>
+  <rect x="10" y="484" width="880" height="30" class="hw"/>
+  <text x="450" y="505" text-anchor="middle" class="lbl">hardware</text>
+</svg>

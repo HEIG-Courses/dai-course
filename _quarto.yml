@@ -23,6 +23,8 @@ website:
             text: "03 · Java, IntelliJ & Maven"
           - href: chapters/04-java-io.qmd
             text: "04 · Java I/O"
+          - href: chapters/05-docker.qmd
+            text: "05 · Docker & Compose"
       - section: "Practical work"
         contents:
           - href: practical-work/pw1.qmd
