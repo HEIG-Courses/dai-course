@@ -154,6 +154,8 @@ cat date.txt
 
 ## A Compose file
 
+A YAML file, `docker-compose.yaml`, at the root of your project:
+
 ```yaml
 services:
   nginx:
@@ -172,7 +174,7 @@ starts the whole application with one command.
 ```sh
 docker compose up -d
 docker compose ps
-docker compose logs -f
+docker compose logs -f [service]
 docker compose down
 ```
 
@@ -180,9 +182,10 @@ docker compose down
 
 ## Networks
 
-- Containers are isolated: no network, no conversation.
-- On a network, a container is reachable **by its name**, like a domain
-  name.
+- Without a network of your own, containers share Docker's default
+  `bridge`: they reach each other by IP, but names do not resolve.
+- On a network you create, a container is reachable **by its name**,
+  like a domain name.
 
 ```sh
 docker network create my-network
