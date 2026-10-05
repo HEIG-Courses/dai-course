@@ -32,10 +32,12 @@ subtitle: "DAI · Chapter 04"
 
 ## The `java.io` package
 
-- Every class in this chapter comes from `java.io`.
-- Not `java.nio`, a more advanced API that we do not cover.
-- And not `java.util.stream` (`.map()`, `.filter()`), which is unrelated
-  despite its name.
+- The stream classes of this chapter come from `java.io`.
+- Charsets come from `java.nio.charset` (`StandardCharsets`): you need
+  them on every reader and writer.
+- What we skip is the channel API of `java.nio`, and
+  `java.util.stream` (`.map()`, `.filter()`), a different idea despite
+  the name.
 
 ## Binary data vs text data
 
@@ -177,9 +179,9 @@ while ((n = in.read(buffer)) != -1) {
   stored as:
   - `0x12 0x34 0x56 0x78` in **big endian** (most significant byte first).
   - `0x78 0x56 0x34 0x12` in **little endian** (least significant byte first).
-- Byte streams have no endianness. File formats and protocols do.
-- IP, TCP and UDP use big endian ("network byte order"). BMP and WAV
-  use little endian.
+- Byte streams have no endianness. Formats and protocols do.
+- IP, TCP, UDP: big endian ("network byte order"). BMP, WAV: little
+  endian.
 
 # Text data
 
@@ -198,7 +200,7 @@ Reader reader = new FileReader("in.txt", StandardCharsets.UTF_8);
 Writer writer = new FileWriter("out.txt", StandardCharsets.UTF_8);
 ```
 
-- `Reader` and `Writer` work with characters, not bytes.
+- `Reader` and `Writer` work with text (`char`s), not with raw bytes.
 - The **charset** tells Java how to turn bytes into characters, and back.
 - What is a charset, and what happens if it is wrong?
 
@@ -223,10 +225,9 @@ UTF-16     12 bytes: FE FF 00 E9 00 6C 00 E8 00 76 00 65
 - Stored in an 8-bit byte, ASCII only uses the values 0 to 127.
 - A **code page** gives a meaning to the values 128 to 255, and keeps
   ASCII for 0 to 127. Each code page uses them differently.
-- Examples: ISO-8859-1 (Latin-1), ISO-8859-15 (adds `€`),
+- Examples: ISO-8859-1 (Latin-1), ISO-8859-15 (Latin-1 with `€`),
   Windows-1252, Mac OS Roman…
-- 256 values leave no room for languages with thousands of characters,
-  such as Chinese.
+- One byte leaves no room for Chinese and its thousands of characters.
 
 ::: {.notes}
 Why 7 bits? To save transmission costs. The 8th bit was used for parity,
@@ -298,7 +299,7 @@ Unicode started with 16 bits; emojis are above U+FFFF.
 | `U+10000`-`U+10FFFF` | 4     | `11110xxx 10xxxxxx 10xxxxxx 10xxxxxx`     |
 :::
 
-- The `x` bits hold the code point. The first bits give the byte's role:
+- The `x` bits hold the code point, the first bits give the byte's role:
   - `0`: a 1-byte character (ASCII).
   - `110`, `1110`, `11110`: start of a 2, 3 or 4-byte character.
   - `10`: continuation byte.
@@ -321,6 +322,8 @@ Unicode started with 16 bits; emojis are above U+FFFF.
 ## Java and Unicode
 
 - A Java `String` holds Unicode text: any language, any emoji.
+- A `char` is a UTF-16 unit, not a character: `"I😂DAI".length()` is 6,
+  not 5. `codePoints()` counts code points.
 - Encoding happens at the border: when bytes become characters
   (reading) or characters become bytes (writing). That is where you
   give the charset.
@@ -457,7 +460,9 @@ try (Reader reader = new FileReader("in.txt", StandardCharsets.UTF_8);
 ## Common pitfalls
 
 - No charset: it works on your machine and breaks elsewhere.
-- No buffer: correct, but slow.
+- No buffer when reading small pieces: correct, but slow.
+- `String.length()` counts `char`s, not characters: `"I😂DAI".length()`
+  is 6, not 5.
 - No close or no flush: incomplete files and lost messages.
 - `PrintWriter` hides errors: use `BufferedWriter` instead.
 - `BufferedReader.ready()` does not mean "end of file": loop until

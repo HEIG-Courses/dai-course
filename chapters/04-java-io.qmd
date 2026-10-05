@@ -76,19 +76,23 @@ similar names:
 
 - `java.nio` ("new I/O") is a more recent API, more flexible and
   sometimes more efficient, designed for advanced cases such as scalable
-  servers. We do not cover it (see *Go further*). **Use `java.io` in the
-  exercises and practical works**.
+  servers. We do not cover it (see *Go further*). **Use the `java.io`
+  streams in the exercises and practical works**. One exception, which
+  you will use everywhere: charsets live in `java.nio.charset`
+  (`StandardCharsets`, `Charset`), and every reader and writer needs
+  one.
 - `java.util.stream` (`IntStream`, `.map()`, `.filter()`…) is about
-  functional-style processing of collections. It has nothing to do with
-  I/O streams despite the name.
+  functional-style processing of collections: a different idea despite
+  the name, even if `BufferedReader.lines()` bridges the two.
 
 ## Two types of data
 
 All data is stored as bytes. What differs is how you *use* them:
 
-- **Binary data** is used as raw bytes, without interpretation: images,
-  audio, archives, compiled programs. You copy, compute or transform
-  bytes.
+- **Binary data** is handled as bytes by your I/O code: images, audio,
+  archives, compiled programs. You copy or move them without turning
+  them into characters. The format itself still has a structure (a BMP
+  header, a WAV chunk), it is just not a character encoding.
 - **Text data** must be *interpreted* to become characters: source
   code, CSV, JSON, configuration files. Turning bytes into characters
   requires a **character encoding** (see [Text data](#text-data)).
@@ -199,13 +203,15 @@ also closes the inner one.
 
 Example [`02-reading-and-writing-binary-data-with-buffers`]({{< var examples-url >}}/tree/main/04-java-io/02-reading-and-writing-binary-data-with-buffers): the same
 programs with `BufferedInputStream` and `BufferedOutputStream`. Compare
-with example 01: only the line that opens the stream changes.
+with example 01: the loop is identical, only the stream that is opened
+changes.
 
 ::: {.callout-important title="Flush"}
 Data written to a buffered stream waits in memory until the buffer is
 full. `flush()` sends what is in the buffer to the operating system
 now. `close()` flushes before closing, so a file you close correctly
-is complete. But on a network connection you keep open, you **must**
+is complete, and the explicit `flush()` you see in the examples is
+redundant there. But on a network connection you keep open, you **must**
 call `flush()` after each message, or the other side waits for data
 that sits in your buffer. Take the habit now.
 :::
@@ -224,15 +230,19 @@ while ((n = in.read(buffer)) != -1) {
 }
 ```
 
-- `read(byte[])` fills the array **as much as it can** and returns how
-  many bytes it read. At the end of a file, and often on a network
-  connection, that is fewer than the array size.
+- `read(byte[])` reads **at least one** byte and **at most** the size of
+  the array, and returns how many it read. It does not promise to fill
+  the array: on a file you usually get a full block until the last one,
+  but on a network connection a short read in the middle of a message is
+  normal, and only means that nothing more has arrived yet. Only `-1`
+  means the end of the stream.
 - So write `write(buffer, 0, n)`, never `write(buffer)`: the second one
   also writes the old bytes left at the end of the array. Copying a
   10,000-byte file with `write(buffer)` gives a 16,384-byte file.
 
 Copying 10 MiB this way takes under 20 ms (4 to 18 ms in our runs),
-against about 60 ms byte by byte through a buffered stream. With a
+where the same copy byte by byte through buffered streams takes around
+100 ms. With a
 socket, you will read blocks in exactly the same way.
 
 Example [`10-reading-and-writing-blocks`]({{< var examples-url >}}/tree/main/04-java-io/10-reading-and-writing-blocks): copies its own source in
@@ -248,13 +258,12 @@ A number larger than one byte is stored as several bytes, in some order:
 - **Little endian** (least significant byte first): `0x12345678` is
   stored as `0x78 0x56 0x34 0x12`.
 
-`InputStream` and `OutputStream` only deal with single bytes, so they
-have no endianness. It matters as soon as you read or write numbers of
+`InputStream` and `OutputStream` never interpret several bytes as one
+number, so they have no endianness. It matters as soon as you read or write numbers of
 several bytes: a file format or a network protocol always specifies its
 byte order. The Internet protocols (IP, TCP, UDP) use big endian, which
 is why big endian is also called **network byte order**
-([RFC 1700](https://www.rfc-editor.org/rfc/rfc1700),
-[RFC 791](https://www.rfc-editor.org/rfc/rfc791), appendix B). Other
+([RFC 791](https://www.rfc-editor.org/rfc/rfc791), appendix B). Other
 formats choose little endian: BMP images, WAV audio, or the numbers in
 Protocol Buffers messages. Reading with the wrong order gives wrong
 numbers, silently.
@@ -313,7 +322,7 @@ garbage appears.
 ### ASCII and code pages
 
 **ASCII** (1963) maps 128 values to characters, so it uses 7 bits: `A`
-is 65 (`0x41`), `a` is 97, the digit `0` is 48, and 0 to 31 are control
+is 65 (`0x41`), `a` is 97, the digit `0` is 48, and 0 to 31 and 127 are control
 characters such as the line feed (10). It covers English and nothing
 else: no `é`, no `ü`, no `ç`. The committee chose 7 bits to save
 transmission costs. An 8th bit, when present, was used to detect
@@ -336,13 +345,16 @@ values 0 to 127, and the values 128 to 255 were free. Vendors used them
 for the characters of their languages, each in their own way. These
 extensions are called **code pages**: each one keeps ASCII for 0 to 127
 and gives its own meaning to 128 to 255. Examples: ISO-8859-1
-(Latin-1, Western Europe), ISO-8859-15 (Latin-9, adds `€`), Windows-1252
+(Latin-1, Western Europe), ISO-8859-15 (Latin-9, which replaces a few
+rare symbols of Latin-1 with `€`, `œ` and `Ÿ`), Windows-1252
 (a Latin-1 variant with extra characters such as `€` and curly quotes),
 Mac OS Roman, and many more.
 
 The same byte means different characters in different code pages, and
-no code page can hold languages with thousands of characters such as
-Chinese. Hence Unicode.
+no **single-byte** code page can hold languages with thousands of
+characters such as Chinese. Double-byte code pages were invented for
+Chinese and Japanese, but each one worked only for its own language.
+Hence Unicode.
 
 ### Unicode
 
@@ -366,14 +378,17 @@ not *which bytes* store that number. That is the job of the **UTF**
 encodings (Unicode Transformation Formats).
 :::
 
-| Encoding | Bytes per character | Used by                                  |
+| Encoding | Bytes per code point | Used by                                 |
 |----------|---------------------|------------------------------------------|
 | UTF-8    | 1 to 4              | The web, Linux, macOS, most files        |
 | UTF-16   | 2 or 4              | Java, JavaScript and Windows, internally |
 | UTF-32   | always 4            | Rarely used: simple, but large           |
 
 The same code point gives different bytes in each encoding: `é`
-(`U+00E9`) is `C3 A9` in UTF-8 and `00 E9` in UTF-16.
+(`U+00E9`) is `C3 A9` in UTF-8 and `00 E9` in UTF-16BE. Careful with the
+name: the charset called `UTF-16` in Java writes a BOM first, then
+big-endian units, so `é` takes 4 bytes; `UTF-16BE` and `UTF-16LE` write
+no BOM.
 
 ### UTF-8
 
@@ -400,7 +415,9 @@ Consequences:
 - ASCII characters take 1 byte, with the same value as in ASCII: **an
   ASCII file is also a valid UTF-8 file**.
 - Accented Latin letters, Greek, Cyrillic, Arabic take 2 bytes. Most
-  Chinese, Japanese and Korean characters take 3, emojis take 4.
+  Chinese, Japanese and Korean characters take 3, and most emojis take
+  4. Some emojis are built from several code points and take more: the
+  Swiss flag 🇨🇭 is two code points and 8 bytes.
 
 UTF-8 is the encoding of the web, of Linux and macOS, and of most modern
 formats and languages. **When you choose, choose UTF-8.**
@@ -439,8 +456,10 @@ A Java `String` holds Unicode text, so it can contain any language. But:
 - A `char` is 16 bits: one UTF-16 *unit*, not one character. A code
   point above the BMP (an emoji) needs **two** `char`s (see *Go
   further*: surrogate pairs). `"I😂DAI".length()`
-  returns 6, not 5. Use `codePoints()` when you need real characters
-  ([exercise 4](#sec-ex4)). Example [`08-code-points`]({{< var examples-url >}}/tree/main/04-java-io/08-code-points) walks
+  returns 6, not 5. Use `codePoints()` to count code points
+  ([exercise 4](#sec-ex4)). Even then, what the reader sees as one
+  character can be several code points: 🇨🇭 is two, and `é` written as
+  `e` plus an accent is two (see *Go further*). Example [`08-code-points`]({{< var examples-url >}}/tree/main/04-java-io/08-code-points) walks
   through `"I😂DAI"` twice: with `charAt()` (6 `char`s, the emoji
   appears as two numbers) and with `codePoints()` (5 code points).
 - Encoding happens at the border, when characters become bytes (writing)
@@ -477,9 +496,10 @@ Example [`05-reading-and-writing-text-data-with-buffers`]({{< var examples-url >
 does the same copy as example 04, with `BufferedReader` and
 `BufferedWriter`.
 
-**Text is always built on top of bytes**: both branches of the diagram
-start from the same byte stream, and the text classes wrap the binary
-ones. `FileInputStream` plus `InputStreamReader` is so common that one
+**Text in a file or on a socket is always built on top of bytes**: both
+branches of the diagram start from the same byte stream, and the text
+classes wrap the binary ones. Text already in memory (`StringReader`,
+`StringWriter`) needs no encoding, because no bytes are involved. `FileInputStream` plus `InputStreamReader` is so common that one
 class combines them: `FileReader`. Writing mirrors reading:
 `FileOutputStream`, then `OutputStreamWriter`, then `BufferedWriter`.
 
@@ -498,8 +518,9 @@ on the operating system:
 | Windows                 | CR LF       | `\r\n` (`0x0D 0x0A`)  |
 
 `BufferedReader.readLine()` reads one line and returns it **without**
-its line ending (and `null` at the end of the file). It accepts both
-`\n` and `\r\n`.
+its line ending (and `null` at the end of the file). It ends a line on
+`\n`, on `\r\n`, **or on a lone `\r`**, so the three conventions are read
+correctly. The other side of the coin: a `\r` that was data is lost.
 
 When you write, you add the line ending yourself:
 
@@ -715,8 +736,10 @@ unbuffered, 59 ms and 55 ms buffered.
 2. Unbuffered: one per byte, about 10 million in each direction.
    Buffered: one per 8 KiB block, about 1,300.
 3. With 1 KiB, both versions finish in a few milliseconds, too little
-   to measure reliably. Buffering matters when there is a lot of data,
-   but it never hurts: always buffer.
+   to measure reliably. Buffer whenever you read or write small pieces
+   (one byte, one char, one line). If you already move whole blocks with
+   your own array, the buffer brings nothing: the block **is** the
+   buffer.
 4. Under 20 ms on the M3 laptop (4 to 18 ms), several times faster than byte by byte
    through a buffer: there are no per-byte method calls left.
 

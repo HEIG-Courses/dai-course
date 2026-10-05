@@ -16,7 +16,7 @@ subtitle: "DAI · Part 1"
 
 The whole process uses **input/output** (IO) operations!
 
-# For network programming, you need to know how to do IOs. But for this, you will need some tools and some knowledge.
+# Network programming starts with inputs and outputs - and with the tools to handle them
 
 ## What will you learn?
 

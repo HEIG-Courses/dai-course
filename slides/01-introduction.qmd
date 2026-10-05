@@ -37,8 +37,7 @@ subtitle: "DAI · Chapter 01"
 
 - [Fiche d'unité](https://heigvd-dai-26.github.io/resources.html) (2026-2027)
 - Three (3) ECTS credits (~90 hours of work):
-  - 64 periods of 45 minutes (= 48 hours in class).
-  - The rest outside class. We do our best to keep it reasonable.
+  - 64 periods of 45 minutes (= 48 hours in class), the rest outside.
 
 > **Connaissances préalables recommandées** : programmation (Java, C) ;
 > programmation orientée objet ; TCP/IP.
@@ -78,8 +77,8 @@ subtitle: "DAI · Chapter 01"
 - Web infrastructures (reverse proxy, load balancer, sticky sessions).
 - How to read and write technical documentation.
 
-At the end of the course, you will be able to create applications that
-communicate over the network: business applications, APIs, games, etc.!
+At the end, you will be able to write applications that talk over the
+network: business applications, APIs, games.
 
 ## Technologies
 
