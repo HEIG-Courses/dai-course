@@ -91,6 +91,10 @@ docker run --rm -it ubuntu:26.04 /bin/bash
 - `-it`: connect your terminal.
 - Anything you change inside is lost: the image never changed.
 
+## Docker
+
+![](../chapters/images/05-docker/docker-architecture.png){fig-alt="The Docker client, the Docker host with its daemon, containers and images, and the registry." .nostretch width="92%"}
+
 ## The Dockerfile
 
 A text file, next to your code, with the instructions to build an image:
@@ -121,13 +125,20 @@ docker run --rm my-image
 | `ENTRYPOINT` | the program to start |
 | `CMD` | the default arguments |
 
-## ENTRYPOINT or CMD?
+## Images and layers
 
-- The container **is one application**: `ENTRYPOINT` for the program,
-  `CMD` for its default arguments.
-- The container **is a box with tools**: `CMD` alone, so anything can be
-  run in it.
-- `docker run my-image <args>` replaces `CMD`, never `ENTRYPOINT`.
+![](../chapters/images/05-docker/dockerfile-layers.svg){fig-alt="A Dockerfile on the left, one arrow per instruction, the image layers on the right with their size." width="100%"}
+
+- Each instruction adds a **layer**, read-only, shared between the
+  images that use it.
+
+## Images and layers
+
+- A container adds a thin **writable** layer on top of the image.
+- Everything it writes goes there, and dies with it.
+- Ten containers of one image cost almost nothing.
+
+![](../chapters/images/05-docker/container-layers.webp){fig-alt="The read-only image layers, and the thin read-write container layer above them." .nostretch fig-align="center" height="320"}
 
 ## Volumes
 
@@ -146,15 +157,15 @@ cat date.txt
 
 - A real application is several containers: a server, a database, a
   proxy.
-- Starting them one by one, with the right options and the right
-  network, gets tedious and error-prone.
-- **Docker Compose** describes them all in **one file**, starts them
-  with **one command**, and puts them on the **same network** so they
-  can talk to each other.
+- Starting them, connecting them and restarting them together is
+  **container orchestration**.
+- **Docker Compose** does it on **one machine**: one file, one command,
+  one network where they find each other.
+- Across many machines: Kubernetes, Swarm, Nomad. Same ideas, heavier.
 
 ## A Compose file
 
-A YAML file, `docker-compose.yaml`, at the root of your project:
+A YAML file, `compose.yaml`, at the root of your project:
 
 ```yaml
 services:
@@ -257,4 +268,8 @@ In `05-docker` of the [code examples]({{< var examples-url >}}):
   by L. Delafontaine and H. Louis, licensed
   [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/), as is
   this deck.
+- Architecture and layer diagrams from the
+  [Docker documentation](https://docs.docker.com), licensed
+  [Apache 2.0](https://github.com/docker/docs/blob/main/LICENSE); the
+  architecture one is relabelled.
 :::

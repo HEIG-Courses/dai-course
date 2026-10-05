@@ -188,6 +188,9 @@ Docker has two parts:
 - the **client**, the `docker` command you type, which sends orders to
   the daemon.
 
+![The client sends orders to the daemon, which builds images, runs
+containers, and talks to the registry.](images/05-docker/docker-architecture.png){fig-alt="The Docker client, the Docker host with its daemon, containers and images, and the registry."}
+
 On Linux the daemon runs directly on your machine. On macOS and Windows
 it runs inside a virtual machine, which Docker Desktop manages for you.
 
@@ -293,6 +296,73 @@ docker image prune                 # delete dangling images (-a: all unused)
 ```
 :::
 
+## Layers
+
+An image is not one block. It is a stack of **layers**, and the
+`Dockerfile` builds them one instruction at a time.
+
+![Each instruction of the `Dockerfile` adds one layer to the
+image.](images/05-docker/dockerfile-layers.svg){fig-alt="A Dockerfile on the left, one arrow per instruction, the image layers on the right with their size."}
+
+`docker history` lists the layers of an image, the newest first:
+
+```sh
+docker history my-image
+```
+
+```
+CREATED BY                                      SIZE
+ENTRYPOINT ["cat" "app.txt"]                    0B
+RUN /bin/sh -c mkdir /data # buildkit           8.19kB
+COPY app.txt . # buildkit                       12.3kB
+WORKDIR /app                                    8.19kB
+CMD ["/bin/sh"]                                 0B
+ADD alpine-minirootfs-3.24.2-aarch64.tar.gz …   9.31MB
+```
+
+The bottom two lines come from the base image, the others from the
+`Dockerfile`. `ENTRYPOINT` weighs nothing, `RUN` and `COPY` weigh what
+they wrote.
+
+Docker keeps the layers it has already built, so a second build only
+redoes what changed.
+
+### Images share their layers
+
+A layer belongs to no image in particular: it is stored once, and every
+image that uses it points at it.
+
+![Four containers on one image: those layers exist once, and each
+container adds its own thin layer on top.](images/05-docker/sharing-layers.webp){fig-alt="Several containers sharing the layers of one image, each with its own thin read-write layer."}
+
+Two images built on the same base share that base. `docker system df -v`
+shows it: the two images below weigh 13.5 MB each, but 9.3 MB of that is
+the same Alpine base, counted once.
+
+```
+REPOSITORY    SIZE      SHARED SIZE   UNIQUE SIZE
+layer-demo2   13.5MB    9.314MB       4.204MB
+layer-demo    13.5MB    9.314MB       4.221MB
+```
+
+The same happens when you pull: Docker downloads only the layers it does
+not have yet, and prints `Already exists` for the others.
+
+### The container's thin writable layer
+
+The layers of an image are **read-only**. When you start a container,
+Docker adds one thin **read-write** layer on top, and only that layer
+belongs to the container.
+
+![A container is the layers of its image, plus a thin writable layer of
+its own.](images/05-docker/container-layers.webp){fig-alt="The read-only image layers with a padlock, and the thin read-write container layer above them."}
+
+Everything the container writes goes there. A file it modifies is first
+copied up into that layer, and the image below never changes - which is
+why ten containers of the same image cost almost nothing, why the image
+is identical everywhere, and why **what a container writes dies with
+it**. To keep data, you need a volume.
+
 ## Volumes and bind mounts
 
 A container that writes a file writes it inside itself, and the file
@@ -370,11 +440,29 @@ publishes.
 
 ## Docker Compose
 
-One `docker run` command per container becomes tedious as soon as an
-application has two of them. **Docker Compose** describes the whole set
-in one file, `compose.yaml` (the older name `docker-compose.yaml` still
-works, and that is what the examples use), and starts everything with
-one command:
+A real application is rarely one container. A web application is a
+server, a database, often a cache and a reverse proxy in front. Each one
+has to be started with the right ports, the right volumes and the right
+environment variables, on a network where the others can find it, and
+started again when it fails or when the machine reboots.
+
+Running a group of containers together like this is called **container
+orchestration**: an orchestrator starts the containers, connects them,
+watches them, and restarts the ones that die.
+
+**Docker Compose** is the simplest of them, and the one you will use in
+this course. It orchestrates containers **on a single machine**, which
+is exactly what you need to develop, to test, and to run a small
+application on a server. When an application has to spread over several
+machines, grow and shrink with the load and survive the loss of a
+machine, the job goes to a bigger orchestrator:
+[Kubernetes](https://kubernetes.io/),
+[Docker Swarm](https://docs.docker.com/engine/swarm/) or
+[Nomad](https://www.nomadproject.io/). The ideas are the same, the
+machinery is much heavier.
+
+Compose describes the whole set in one file, `compose.yaml`, at the root
+of your project, and starts everything with one command:
 
 ```yaml
 services:
@@ -714,7 +802,7 @@ private: change its visibility in the package settings.
 
 ### Exercise 8: Two services with Compose {#sec-ex8}
 
-Write a `docker-compose.yaml` that starts your published image twice:
+Write a `compose.yaml` that starts your published image twice:
 one service that runs once and exits, and one that keeps running with
 `--loop`. Start them, read the logs of the second one, then stop
 everything.
@@ -764,14 +852,13 @@ If exercise 7 did not work out, use your local image name instead of the
 Optional content: useful general knowledge, not required for the
 evaluations.
 
-::: {.callout-note collapse="true" title="Layers and the build cache"}
-Each instruction that changes the file system (`RUN`, `COPY`, `ADD`)
-creates a **layer**, and Docker caches them. The others (`ENV`,
-`WORKDIR`, `CMD`, `ENTRYPOINT`) only change the image's metadata. When you build again, it reuses every layer up to the first
-one that changed, and rebuilds the rest. This is why a `Dockerfile`
-usually copies the dependency files and installs them **before** copying
-the source code: the source changes at every build, the dependencies do
-not.
+::: {.callout-note collapse="true" title="The build cache"}
+When you build again, Docker reuses every layer up to the **first
+instruction whose result changed**, and rebuilds only the rest.
+
+This is why a `Dockerfile` installs the dependencies **before** copying
+the source code: the source changes at every build, the dependencies
+almost never, so the long layer stays in the cache.
 :::
 
 ::: {.callout-note collapse="true" title="Repeatable is not reproducible"}
@@ -848,11 +935,7 @@ docker system prune    # delete what is unused (careful)
 Other container engines: [Podman](https://podman.io/) (no daemon, no
 root), [containerd](https://containerd.io/), [LXC](https://linuxcontainers.org/).
 Other registries: [Docker Hub](https://hub.docker.com),
-[Quay](https://quay.io/), and the registry of your cloud provider. To
-run containers across several machines:
-[Kubernetes](https://kubernetes.io/), [Docker
-Swarm](https://docs.docker.com/engine/swarm/),
-[Nomad](https://www.nomadproject.io/).
+[Quay](https://quay.io/), and the registry of your cloud provider.
 :::
 
 ## Sources
@@ -863,3 +946,7 @@ Swarm](https://docs.docker.com/engine/swarm/),
   [HEIG-VD DAI course](https://github.com/heig-vd-dai-course/heig-vd-dai-course)
   by L. Delafontaine and H. Louis, licensed
   [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/).
+- The architecture and layer diagrams come from the
+  [Docker documentation](https://docs.docker.com), licensed
+  [Apache 2.0](https://github.com/docker/docs/blob/main/LICENSE); the
+  architecture one is relabelled.
