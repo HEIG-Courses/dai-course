@@ -3,9 +3,10 @@ title: "Environment setup"
 subtitle: "Chapter 00: do this before the first course"
 ---
 
-Before the semester starts, you will install everything the course relies
-on: a Unix environment (WSL for Windows users), Git and a GitHub account,
-Java and Maven, and IntelliJ IDEA.
+Before the semester starts, you will install what you need for the first
+weeks: a Unix environment (WSL for Windows users), Git and a GitHub
+account, Java and Maven, and IntelliJ IDEA. Docker comes later, in
+[chapter 05](05-docker.qmd).
 
 Every step ends with a **verification command**. If all verifications pass,
 you are ready. If you get stuck, check the troubleshooting boxes first,
@@ -13,7 +14,7 @@ then ask us. We will also take a moment during the first course for
 remaining problems.
 
 ::: {.callout-note}
-Estimated time: 1–2 hours on Windows (WSL setup included), ~30 minutes on
+Estimated time: 1-2 hours on Windows (WSL setup included), ~30 minutes on
 macOS or Linux.
 :::
 
@@ -44,9 +45,10 @@ On **macOS or Linux**, skip to [Terminal basics](#terminal-basics).
 
 Software development on Windows is harder than on Linux or macOS. The
 Windows Subsystem for Linux (WSL) gives you a real Linux environment inside
-Windows. You will use it for the whole semester: **every command in this
-course runs in the Ubuntu terminal**, no other environment (Git Bash,
-Cygwin, …) is supported.
+Windows. You will use it for the whole semester: **every command of the
+course material runs in the Ubuntu terminal**. The Windows setup steps
+on this page are the one exception, and they are marked PowerShell. No
+other environment (Git Bash, Cygwin, …) is supported.
 
 ### Install WSL and Ubuntu
 
@@ -157,8 +159,9 @@ Add-MpPreference -ExclusionPath '\\wsl.localhost\Ubuntu-<your-version>'
 ::: {.callout-important collapse="true" title="WSL troubleshooting"}
 - **Error 403 during install/update**: your network blocks the download.
   Try another network (e.g. phone hotspot).
-- **WSL not available**: check your Windows version (WSL needs Windows 10
-  1607+): `systeminfo | Select-String "^OS Name","^OS Version"`.
+- **WSL not available**: check your Windows version. `wsl --install`
+  needs Windows 10 version 2004 (build 19041) or newer, or Windows 11:
+  `systeminfo | Select-String "^OS Name","^OS Version"`.
 - **Required features**: in an administrator PowerShell:
   ```powershell
   dism.exe /online /enable-feature /featurename:Microsoft-Windows-Subsystem-Linux /all /norestart
@@ -215,7 +218,9 @@ brew install git
 
 :::
 
-Then introduce yourself to Git (used to sign your commits' metadata):
+Then tell Git who you are. Git stamps this name and this email on every
+commit you make. It is a label, not a proof: you will add real
+cryptographic signatures in [chapter 02](02-git-github.qmd).
 
 ```sh
 git config --global user.name "First-name Last-name"

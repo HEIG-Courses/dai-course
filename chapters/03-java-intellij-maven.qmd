@@ -25,7 +25,8 @@ checklist fails, fix that first.
 
 > Java is a general-purpose, class-based, object-oriented programming
 > language. It is intended to let programmers write once, run anywhere
-> (WORA). (<https://www.java.com/>)
+> (WORA).
+> ([Wikipedia](https://en.wikipedia.org/wiki/Java_(programming_language)))
 
 Created by James Gosling at Sun Microsystems (now Oracle) and released in
 1995, Java remains one of the most used languages, especially for
@@ -34,15 +35,20 @@ client-server applications.
 ### The Java virtual machine
 
 Java source code is compiled to **bytecode**, which is executed by the
-**Java virtual machine (JVM)**. The same compiled code runs on every
-platform that has a JVM: that is what makes Java portable.
+**Java virtual machine (JVM)**. The same compiled code runs on any
+platform whose JVM is at least as recent as the version it was compiled
+for: that is what makes Java portable.
 
-Many JVM implementations exist. Two packages matter to you:
+These three names are nested, not alternatives:
 
-- The **JDK** (Java Development Kit): what you need to *develop*.
-- The **JRE** (Java Runtime Environment): what you need to *run*.
+- A **JVM** executes bytecode.
+- A **JRE** (Java Runtime Environment) is a JVM plus the standard
+  library: enough to *run* a program.
+- A **JDK** (Java Development Kit) is a JRE plus the compiler and the
+  tools: enough to *develop*.
 
-We use the **Eclipse Temurin** distribution.
+You install a JDK and you have all three. **Eclipse Temurin** is the
+distribution, the build we use.
 
 ### Versions and version managers
 
@@ -77,8 +83,9 @@ java HelloWorld
 ```
 
 Real applications are packaged into a **JAR** (Java ARchive) file: a ZIP
-containing the bytecode and resources, runnable anywhere Java is
-installed:
+containing the bytecode and resources. With an entry point declared in
+its manifest (exercise 3), it runs on any machine with a compatible
+Java:
 
 ```sh
 java -Xmx1024M -Xms1024M -jar minecraft_server.1.21.jar nogui
@@ -90,14 +97,15 @@ and initial memory of the JVM, one of many tuning knobs.)
 ### Garbage collection
 
 Java manages memory automatically: no manual allocation and freeing as in
-C or C++. The **garbage collector** (GC) runs periodically and frees
-objects that are no longer referenced (out of scope or set to `null`).
+C or C++. The **garbage collector** (GC) reclaims objects your program
+can no longer reach. Leaving a scope, or setting the last reference to
+`null`, makes an object *eligible*; the JVM decides when to free it.
 
 ## IntelliJ IDEA
 
 > IntelliJ IDEA is an integrated development environment (IDE) written in
 > Java for developing computer software.
-> (<https://www.jetbrains.com/idea/>)
+> ([Wikipedia](https://en.wikipedia.org/wiki/IntelliJ_IDEA))
 
 IntelliJ IDEA is the reference IDE for Java development. It exists in two
 editions: **Community** (free, sufficient for this course) and
@@ -197,21 +205,22 @@ phases**: when a phase runs, its goals run. Default bindings include:
 - `test` phase: runs the `surefire:test` goal.
 - `package` phase: runs the `jar:jar` goal.
 
-A goal can also run directly, outside any lifecycle: you already did it
-with `mvn wrapper:wrapper`, and `./mvnw dependency:tree` (try it later)
+A goal can also run directly, outside any lifecycle: you will do it with
+`mvn wrapper:wrapper` in exercise 2, and `./mvnw dependency:tree`
 prints your dependency tree without building anything.
 
 In short: a **lifecycle** is the overall process, a **phase** is a step
-in it, a **goal** is the plugin action executed at that step, and the
-task is the actual work done (turning `.java` files into `.class`
-files).
+in it, and a **goal** is the plugin action that does the actual work at
+that step (turning `.java` files into `.class` files).
 
 ### Maven Central
 
-The [Maven Repository](https://mvnrepository.com/) indexes the public
-libraries you can use. Search a library, copy its dependency declaration
-into your `pom.xml`, and Maven downloads it automatically, transitive
-dependencies included.
+**Maven Central** (<https://central.sonatype.com>) is the public
+repository Maven downloads from;
+[mvnrepository.com](https://mvnrepository.com/) is a convenient search
+front-end for it. Search a library, copy its dependency declaration into
+your `pom.xml`, and Maven downloads it into your local repository
+(`~/.m2`), transitive dependencies included.
 
 ### The Maven wrapper
 
@@ -240,7 +249,7 @@ this input, this function must return that output. Tests live in
 phase, so **a broken test fails the build** before a broken JAR reaches
 anyone.
 
-The standard library is [JUnit](https://junit.org/). A test is a method
+The de-facto standard testing framework is [JUnit](https://junit.org/). A test is a method
 annotated with `@Test` that makes assertions:
 
 ```java
@@ -254,7 +263,7 @@ class GreetingTest {
 
   @Test
   void greetsByName() {
-    assertEquals("Hello DAI!", Greeting.greet("DAI"));
+    assertEquals("Hello, DAI!", Greeting.greet("Hello", "DAI"));
   }
 }
 ```
@@ -333,7 +342,7 @@ Tell Maven what the entry point of your JAR is, by adding the
 ```xml
 <plugin>
   <artifactId>maven-jar-plugin</artifactId>
-  <version>3.4.2</version>
+  <version>3.5.1</version>
   <configuration>
     <archive>
       <manifest>
@@ -439,7 +448,7 @@ builds a JAR with all dependencies included (check the
 <plugin>
   <groupId>org.apache.maven.plugins</groupId>
   <artifactId>maven-shade-plugin</artifactId>
-  <version>3.6.0</version>
+  <version>3.6.2</version>
   <executions>
     <execution>
       <goals>
@@ -586,7 +595,7 @@ picocli will be used in most practical works. Its
 <dependency>
   <groupId>org.junit.jupiter</groupId>
   <artifactId>junit-jupiter</artifactId>
-  <version>5.13.4</version>
+  <version>6.1.3</version>
   <scope>test</scope>
 </dependency>
 ```
@@ -612,8 +621,8 @@ Everything you learned in [chapter 02](02-git-github.qmd), applied:
 
 1. `git init --initial-branch=main` in the project.
 2. **Clean the `.gitignore`**: IntelliJ generates one full of rules for
-   tools you do not use. Only ignore what your project actually
-   produces:
+   tools you do not use. Keep what your project produces, plus the few
+   files your operating system drops everywhere:
 
 ```gitignore
 ## IntelliJ IDEA

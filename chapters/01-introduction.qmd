@@ -14,7 +14,7 @@ The Internet runs on programs talking to each other. In this course you
 will learn to build them:
 
 - **Network programming** (inputs/outputs, encodings, TCP and UDP):
-  write client–server applications with the Socket API, from the bytes
+  write client-server applications with the Socket API, from the bytes
   up.
 - **Application-level protocols** (SMTP, SSH, HTTP… and your own):
   understand the protocols the Internet runs on, then design one

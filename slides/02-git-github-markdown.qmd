@@ -45,9 +45,10 @@ subtitle: "DAI · Chapter 02"
 ::: {.columns}
 ::: {.column width="55%"}
 - Commits = snapshots of the repository.
-- Each commit has a unique, unalterable **hash**.
+- Each commit has a unique **hash**: change anything and you get a new
+  commit, not a modified one.
 - **Tags** name commits, often releases.
-- **Signed commits** prove authorship → "Verified" badge.
+- **Signed commits**: made by the holder of a key → "Verified" badge.
 :::
 ::: {.column width="45%"}
 ![](https://wac-cdn.atlassian.com/dam/jcr:bb02240a-7d85-4f5a-ae7f-c2727b37fc79/01%20Many%20ways%20of%20referring%20to%20a%20commit.svg)
@@ -79,7 +80,7 @@ subtitle: "DAI · Chapter 02"
 
 ::: {.columns}
 ::: {.column width="55%"}
-- **Merge**: the default, used in this course.
+- **Merge**: keeps both histories, adds a merge commit.
 - **Rebase**: replay commits, linear history.
 - **Squash**: collapse a branch into one commit.
 :::
@@ -106,7 +107,7 @@ subtitle: "DAI · Chapter 02"
 
 - `.gitignore` lists what Git must **not** track.
 - Cleanliness (no build artifacts) and security (no secrets).
-- Commit **source files only**: never `target/`, never binaries.
+- Commit what a human wrote or chose, never what the build produces.
 - Tip: avoid gitignore generators, they add too many unnecessary rules.
 
 ## Summary: Git
@@ -152,7 +153,8 @@ server.**
 ## Issues, pull requests and forks
 
 1. Open an **issue** to discuss the change (optional, recommended).
-2. Clone (or fork) and checkout a new **branch**.
+2. **Fork** if you cannot write to the repository, **clone** it, then
+   create a **branch**.
 3. Commit and push as often as you want.
 4. Create the **pull request**.
 5. A teammate reviews and merges if OK.
@@ -206,7 +208,8 @@ The workflow of your practical works, and of the industry.
 ```
 
 - Fenced code blocks: three backticks **+ the language**.
-- Same conventions as Discord, Telegram, etc.
+- A familiar subset in Discord and Telegram: bold, italic, code,
+  quotes. Not links or tables.
 
 ## Specifications
 

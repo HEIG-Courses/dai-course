@@ -154,8 +154,8 @@ java -Xmx1024M -Xms1024M -jar minecraft_server.1.21.jar nogui
 
 - The reference IDE for Java development.
 - Community Edition is enough. The student license unlocks Ultimate.
-- The `.idea` directory is shared, except its local parts
-  (`.gitignore`).
+- The `.idea` directory is shared, except the files specific to your
+  machine: list those in the project's root `.gitignore`.
 
 # Maven
 
@@ -213,11 +213,12 @@ Configuration and build settings, shared among developers:
 
 - Maven defines the build process, composed of **phases** loading
   plugin **goals**.
-- The phases you will use daily:
+- Default lifecycle, and running one phase runs all the previous ones:
   - `compile`: compile the sources.
   - `test`: run the unit tests.
   - `package`: build the JAR.
-  - `clean`: remove build outputs (`target/`).
+- Separate lifecycle: `clean` deletes `target/`. Hence
+  `./mvnw clean package`.
 
 ## Maven Repository
 

@@ -93,6 +93,9 @@ Read it **before** you start, not the evening before the deadline.
 - **Tests** on the processing, separated from the CLI.
 - A **team** history: issues, pull requests, reviews.
 
+Where the points are: category 1 (Git, GitHub, README) is **40%** of the
+grade, tests are **4%**. A missing test is still a missing point.
+
 ## Presentations
 
 - **8 minutes** per group, computer and projector.

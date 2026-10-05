@@ -120,7 +120,7 @@ The entire week-by-week program is available on the
 
 ## Course sequence
 
-1. Short and concise overview of each subject (20–30 minutes).
+1. Short and concise overview of each subject (20-30 minutes).
 2. Practice the content: exercises with solutions in each chapter.
 3. Practical works: **freedom of subject**, you choose what you build.
 4. Feedback and discussions: very important to us.

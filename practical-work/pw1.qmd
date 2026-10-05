@@ -135,7 +135,7 @@ you are on track.
 
 | # | Date | Milestone |
 |---|------|-----------|
-| 1 | 23.09 | Group and idea published in a Discussion. Repository created, team and teachers added. Maven project with picocli, two empty commands, clean `.gitignore`. |
+| 1 | 23.09 | Group and idea published in a Discussion. Repository created, team added (and the teaching staff if it is private). Maven project with picocli, two empty commands, clean `.gitignore`. |
 | 2 | 29.09 | The processing works on a real file: charset, buffering, `try`-with-resources. First JUnit tests. |
 | 3 | 30.09 | Errors handled with clear messages. Example files in the repository. README with usage and outputs. |
 | 4 | 07.10 | Tests cover the edge cases. README complete. Last pull requests merged. |
@@ -264,6 +264,11 @@ public class UpperCase {
   }
 }
 ```
+
+The method buffers nothing itself: the CLI wraps the files in a
+`BufferedReader` and a `BufferedWriter` before calling it, and the test
+passes a `StringReader`. That separation is the point, and it is what
+criterion 16 looks for.
 
 Text: feed it a `StringReader` and collect the result in a
 `StringWriter`.
