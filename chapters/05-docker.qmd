@@ -69,9 +69,10 @@ environment, without following a page of manual instructions.
 
 Containers give you three things:
 
-- **One recipe**: the Dockerfile says how to build the application and
-  how to start it.
-- **One artefact**: the image, built once, identical on every machine.
+- **One recipe**: the Dockerfile says how to build the image, and what
+  a container started from it runs by default.
+- **One artefact**: each version of the application is one image, built
+  once and identical on every machine.
 - **One interface**: the same commands build, start, stop and inspect
   any application, whatever its language.
 

@@ -47,9 +47,10 @@ subtitle: "DAI · Chapter 05"
 
 ## What it buys you
 
-- **One recipe**: the Dockerfile says how to build and start the
-  application.
-- **One artefact**: the image, built once, identical everywhere.
+- **One recipe**: the Dockerfile says how to build the image, and what
+  a container started from it runs by default.
+- **One artefact**: each version of the application is one image,
+  built once, identical everywhere.
 - **One interface**: the same commands for every application, whatever
   its language.
 
