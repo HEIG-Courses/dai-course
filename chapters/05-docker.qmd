@@ -233,9 +233,9 @@ line. The instructions you need:
 | Instruction | What it does |
 |-------------|--------------|
 | `FROM` | the base image to start from |
-| `WORKDIR` | the working directory for the instructions that follow |
+| `WORKDIR` | the working directory for the instructions that follow, and for the container when it starts |
 | `RUN` | run a command **while building** the image |
-| `COPY` | copy files from your project into the image |
+| `COPY` | copy files from the build context into the image |
 | `ENTRYPOINT` | the program to start when the container starts |
 | `CMD` | the default arguments, or the default command |
 | `ARG` | a value given at build time |

@@ -34,6 +34,7 @@ website:
           - href: practical-work/pw3.qmd
             text: "PW3 · Web app in the cloud"
       - resources.qmd
+      - changelog.qmd
 
 format:
   html:

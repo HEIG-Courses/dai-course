@@ -123,14 +123,16 @@ docker run --rm my-image
 
 ## Useful instructions
 
+::: {style="font-size: 0.85em"}
 | Instruction | What it does |
 |-------------|--------------|
 | `FROM` | the base image |
-| `WORKDIR` | the working directory |
+| `WORKDIR` | the working directory, while building and in the container |
 | `RUN` | run a command **while building** |
-| `COPY` | copy files into the image |
+| `COPY` | copy files from the build context into the image |
 | `ENTRYPOINT` | the program to start |
 | `CMD` | the default command, or the arguments after an `ENTRYPOINT` |
+:::
 
 ## Images and layers
 

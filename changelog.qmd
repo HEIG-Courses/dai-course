@@ -1,0 +1,56 @@
+---
+title: "Changelog"
+---
+
+Mistakes found in the course material and corrected, newest first.
+
+If you read a chapter before the date of an entry, the version you read
+said something wrong or imprecise on that point.
+
+## 6 October 2026
+
+[Chapter 05](chapters/05-docker.qmd), instruction table:
+
+- Correction: `WORKDIR` is also the container's working directory, not
+  only the build's.
+- Correction: `COPY` takes files from the build context, not from
+  anywhere on your machine.
+
+[Code examples]({{< var examples-url >}}), `05-docker`:
+
+- Correction: example 03, the override command used example 02's image
+  name, and the `--entrypoint` line had one `/bin/bash` too many. Both
+  failed.
+- Correction: example 11, rewritten for two terminals, with a cleanup
+  step.
+
+## 5 October 2026
+
+[Chapter 04](chapters/04-java-io.qmd):
+
+- Correction: `read(byte[])` reads at least one byte, at most the array
+  size. Only `-1` means the end.
+- Correction: `readLine()` also ends a line on a lone `\r`.
+- Correction: Java's `UTF-16` charset writes a BOM, so `é` takes 4
+  bytes. `UTF-16BE` takes 2.
+- Clarification: a code point is not always a character: 🇨🇭 is two.
+- Clarification: buffer small reads and writes. Reading blocks needs no
+  buffer.
+- Clarification: charsets come from `java.nio.charset`.
+
+[Chapters 00](chapters/00-environment-setup.qmd) to
+[03](chapters/03-java-intellij-maven.qmd), and
+[practical work 1](practical-work/pw1.qmd):
+
+- Correction: JUnit 6.1.3, shade 3.6.2, jar 3.5.1. The example test now
+  matches exercise 6.
+- Correction: `wsl --install` needs Windows 10 version 2004, not 1607.
+- Correction: your Git name and email are a label, not a signature.
+- Clarification: a signature proves who made the commit, not who wrote
+  the code.
+- Clarification: the profile repository must be public.
+- Clarification: `ssh -T git@github.com` answering "no shell access" is
+  a success.
+- Clarification: never commit what the build produces. Example files and
+  the images of your README belong in the repository.
+- Clarification: PW1, category 1 is 40% of the grade and tests are 4%.

@@ -265,11 +265,6 @@ public class UpperCase {
 }
 ```
 
-The method buffers nothing itself: the CLI wraps the files in a
-`BufferedReader` and a `BufferedWriter` before calling it, and the test
-passes a `StringReader`. That separation is the point, and it is what
-criterion 16 looks for.
-
 Text: feed it a `StringReader` and collect the result in a
 `StringWriter`.
 
