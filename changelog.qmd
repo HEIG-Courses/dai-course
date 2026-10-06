@@ -4,8 +4,8 @@ title: "Changelog"
 
 Important changes and corrected errors, newest first.
 
-If you read a chapter before the date of an entry, the version you read
-said something wrong or imprecise on that point.
+If you read a chapter before the date of an entry, make sure you check
+the corrections.
 
 ## 6 October 2026
 
