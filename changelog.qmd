@@ -2,7 +2,7 @@
 title: "Changelog"
 ---
 
-Mistakes found in the course material and corrected, newest first.
+Important changes and corrected errors, newest first.
 
 If you read a chapter before the date of an entry, the version you read
 said something wrong or imprecise on that point.
