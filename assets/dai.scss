@@ -3,6 +3,10 @@
 // Cosmo base kept stock. This layer only sizes the HEIG-VD logo;
 // red (#e1251b) lives in the logo itself and nowhere else.
 
+// Mermaid diagrams: dark labels and arrows instead of the pale defaults
+$mermaid-edge-color: #343a40;
+$mermaid-label-fg-color: #212529;
+
 /*-- scss:rules --*/
 
 .sidebar-logo {

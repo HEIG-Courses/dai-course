@@ -1,0 +1,337 @@
+---
+title: "Application protocols"
+subtitle: "DAI · Chapter 06"
+---
+
+## Objectives
+
+- Explain what an application protocol adds on top of TCP or UDP.
+- Find the specification of an Internet protocol, and read the parts
+  you need.
+- List the decisions a specification has to make.
+- Write the specification of a simple text protocol, with sequence
+  diagrams.
+
+## What an application protocol is
+
+Your mail program and Google's servers were written by different
+people, years apart. They work together because both follow **SMTP**.
+
+An application protocol says:
+
+- which **messages** exist, and what each one means;
+- the **format** of each message, down to the bytes;
+- the **order**: who speaks first, what may follow what;
+- what happens on an **error**.
+
+## On top of TCP and UDP
+
+| Layer | Examples | Takes care of |
+|---|---|---|
+| Application | SMTP, HTTP, SSH, yours | What the bytes mean |
+| Transport | TCP, UDP | Bytes between **programs** |
+| Network | IP | Packets between two **machines** |
+
+The transport layer moves bytes. What they mean is up to the
+application protocol.
+
+## TCP and UDP
+
+- **TCP**: a reliable, ordered **stream of bytes**. Two messages may
+  arrive in one read, one message in several reads.
+- **UDP**: independent **datagrams**, each delivered whole, which can be
+  lost, duplicated or reordered.
+- Everything else is up to the application protocol: up to you, when
+  you design one.
+
+## Three families
+
+| Family | Messages are | Examples |
+|---|---|---|
+| Text | Lines of text, JSON | SMTP, POP3, IMAP, HTTP/1.1 |
+| On top of HTTP | Requests to resources | Web and mobile APIs (REST) |
+| Binary | Fields in bytes | SSH, DNS, HTTP/2, HTTP/3 |
+
+- Text: readable and typeable by a human, easy to debug.
+- Binary: compact and fast to parse, needs a tool to read.
+
+## RFCs
+
+- Internet protocols are specified by the **IETF**, in **RFCs**
+  (*Request for Comments*).
+- Discussed as drafts, then published with a number.
+- A published RFC **never changes**: a new version is a new RFC that
+  *obsoletes* the old one (IMAP: RFC 3501, then RFC 9051).
+- Not every RFC is a standard: each one has a status.
+- Status and successors: `datatracker.ietf.org/doc/rfc3501`.
+
+## Some RFCs
+
+| Protocol | RFC |
+|---|---|
+| SMTP | 5321 |
+| POP3 | 1939 |
+| IMAP | 9051 |
+| SSH, transport layer | 4253 |
+| HTTP semantics | 9110 |
+| HTTP/1.1, HTTP/2, HTTP/3 | 9112, 9113, 9114 |
+
+Long documents (SMTP: 95 pages): read the **examples** first, then the
+messages you need. Ports: the **IANA** registry.
+
+## A real exchange: SMTP
+
+::: {style="font-size: 0.7em"}
+```text
+S: 220 foo.com Simple Mail Transfer Service Ready
+C: EHLO bar.com
+S: 250-foo.com greets bar.com
+S: 250-8BITMIME
+S: 250-SIZE
+S: 250-DSN
+S: 250 HELP
+C: MAIL FROM:<Smith@bar.com>
+S: 250 OK
+C: RCPT TO:<Jones@foo.com>
+S: 250 OK
+C: RCPT TO:<Green@foo.com>
+S: 550 No such user here
+C: RCPT TO:<Brown@foo.com>
+S: 250 OK
+C: DATA
+S: 354 Start mail input; end with <CRLF>.<CRLF>
+C: Blah blah blah...
+C: ...etc. etc. etc.
+C: .
+S: 250 OK
+C: QUIT
+S: 221 foo.com Service closing transmission channel
+```
+:::
+
+## What it shows
+
+- **Who speaks first**: the server, `220`.
+- **Messages**: a keyword and parameters, exact syntax in the RFC.
+- **Framing**: lines end with `\r\n`; the text of the mail ends with a
+  line holding `.`.
+- **Responses**: a three-digit **code** for the program, a text for the
+  human. Several lines? `250-` on all but the last.
+
+## What it shows: order, errors, extensions
+
+- **Order**: `MAIL`, then `RCPT`, then `DATA`.
+- **Errors**: `550` for Green, Jones and Brown still get the mail.
+- **Extensions**: listed in the answer to `EHLO`.
+- **End**: `QUIT`, then the server closes the connection.
+
+## The decisions you make
+
+A specification answers each question **explicitly**: every answer left
+out becomes a guess in someone else's code.
+
+:::: {.columns}
+::: {.column width="50%"}
+- Transport: TCP or UDP?
+- Port?
+- Who speaks first, who closes?
+- Encoding?
+:::
+::: {.column width="50%"}
+- Framing: where does a message end?
+- Format of the messages?
+- Errors?
+- What about version 2?
+:::
+::::
+
+## Transport: TCP or UDP
+
+- **TCP**: every message matters, in order (chat, turn-based game, file
+  transfer).
+- **UDP**: a lost message does no harm, or the application handles
+  losses (a sensor, a discovery). Say what happens on a loss.
+- You program both in the TCP & UDP chapters. For now: choose, and
+  justify.
+
+## Port
+
+The server listens on a port, the client must know it.
+
+| Range | Name | Use |
+|---|---|---|
+| 0-1023 | System ports | Standard services |
+| 1024-49151 | User ports | Assigned to applications by IANA |
+| 49152-65535 | Dynamic ports | Never assigned, temporary use |
+
+Your protocol: a port between 1024 and 32767, **unassigned** in the IANA
+registry. Above 32768 a Linux client may already hold it.
+
+## Who speaks, which encoding
+
+- The client opens the connection; then either side can **speak first**:
+  the server in SMTP, the client in HTTP. Say which.
+- Say **who closes**, and when: after `QUIT`, after the answer, when
+  the client leaves.
+- **Encoding**: write it down. UTF-8.
+- A length limit says what it counts: 100 characters in UTF-8 can take
+  400 bytes.
+
+## Framing: where a message ends
+
+::: {style="font-size: 0.85em"}
+| Framing | How | Examples |
+|---|---|---|
+| **Delimiter** | Ends with a chosen character | SMTP (`\r\n`), your PW2 |
+| **Length prefix** | Starts with its length | HTTP/1.1 body, binary protocols |
+| **Connection close** | Ends when the sender closes | Daytime |
+:::
+
+- With a delimiter, the delimiter cannot appear **inside** a message:
+  escape it or forbid it.
+- With UDP, one datagram is one message, if it fits.
+
+## Message format
+
+One message per line, a **keyword** in capitals, parameters separated
+by a space:
+
+::: {.center}
+`SEND bob Hello Bob!`
+:::
+
+- A parameter that may contain spaces goes **last**: for `SEND`, split
+  on the first two spaces, the rest is the text.
+
+## Errors
+
+- For each message, list **every** response, errors included.
+- Then the cases tied to no message:
+  - an **unknown** message, missing or invalid parameters;
+  - a valid message at the **wrong time** (`SEND` before `JOIN`);
+  - a client that disappears.
+- Give each error a **code** a program can test.
+
+## Extensibility
+
+A protocol lives longer than its first version.
+
+- A new version **adds** messages, and keeps the existing ones as they
+  are: same syntax, same meaning.
+- An unknown message gets an **error answer**, and the connection stays
+  open: a new client can see that an old server does not know a
+  command.
+- When versions coexist, the first exchange says what each side
+  supports, like SMTP's `EHLO`.
+
+## A specification in four sections
+
+1. **Overview**: what for, which problem.
+2. **Transport protocol**: TCP or UDP, port, encoding, framing, who
+   opens, speaks first and closes, what happens on errors.
+3. **Messages**: syntax, parameters, every response with error codes.
+4. **Examples**: sequence diagrams, error cases included.
+
+- Section 3: **one action at a time**, request and responses together.
+- In Markdown, in your repository.
+
+## Diagrams as text: Mermaid
+
+:::: {.columns}
+::: {.column width="50%"}
+```text
+sequenceDiagram
+    participant C as Client
+    participant S as Server
+    C->>S: GUESS 50
+    S-->>C: LOWER
+    C->>S: GUESS 25
+    S-->>C: HIGHER
+```
+:::
+::: {.column width="50%"}
+```{mermaid}
+sequenceDiagram
+    participant C as Client
+    participant S as Server
+    C->>S: GUESS 50
+    S-->>C: LOWER
+    C->>S: GUESS 25
+    S-->>C: HIGHER
+```
+:::
+::::
+
+- GitHub draws a `mermaid` code block. The diagram is versioned with
+  the specification.
+
+## Example: the SMS protocol
+
+::: {style="font-size: 0.9em"}
+Named users send short messages (at most 100 characters) to each other,
+through a server.
+
+- TCP, port 6435, UTF-8, one message per line ending with `\n`.
+- `JOIN <name>`: `OK`, or `ERROR 1` if the name is taken.
+- `LIST`: `CLIENTS alice bob`.
+- `SEND <recipient> <message>`: `OK`, or `ERROR 1` / `ERROR 2`.
+- The server delivers: `RECEIVE <sender> <message>`.
+- The client leaves by closing the connection.
+- `RECEIVE` arrives at any time: act on the keyword, never wait for a
+  given answer.
+:::
+
+## The SMS protocol
+
+```{mermaid}
+sequenceDiagram
+    participant C1 as Client 1
+    participant S as Server
+    participant C2 as Client 2
+    C1->>S: JOIN alice
+    S-->>C1: OK
+    C2->>S: JOIN bob
+    S-->>C2: OK
+    C1->>S: SEND bob Hello Bob!
+    S-->>C1: OK
+    S->>C2: RECEIVE alice Hello Bob!
+```
+
+## Summary
+
+- An application protocol gives a meaning to the bytes TCP or UDP
+  carry.
+- Real protocols are specified in RFCs: read the examples first.
+- Decide transport, port, encoding, framing, messages, order, errors,
+  and say it **explicitly**.
+- Four sections: overview, transport, messages, examples.
+
+# Questions?
+
+# Exercises
+
+## What will you do?
+
+In the chapter page, and `06-application-protocols` of the
+[code examples]({{< var examples-url >}}):
+
+- Read a real RFC, and talk to a Daytime server.
+- Find the gaps in a short specification.
+- Specify *"Guess the number"* and *"Temperature monitoring"*.
+- Swap specifications with another group.
+- Extend your protocols.
+
+**Help each other, no need to rush!**
+
+## Credits
+
+::: {style="font-size: 0.7em"}
+- O. Tischhauser, with the help of
+  [Claude](https://claude.com) (Anthropic).
+- Based on the
+  [HEIG-VD DAI course](https://github.com/heig-vd-dai-course/heig-vd-dai-course)
+  by L. Delafontaine and H. Louis, licensed
+  [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/), as is
+  this deck, and on the DAI course of J. Ehrensberger.
+- SMTP exchange from RFC 5321, Appendix D.1.
+:::

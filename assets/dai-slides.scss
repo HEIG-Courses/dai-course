@@ -8,6 +8,10 @@ $link-color: $interact-blue;
 $presentation-heading-color: #212529;
 $presentation-heading-font-weight: 600;
 
+// Mermaid diagrams: dark labels and arrows, readable on a projector
+$mermaid-edge-color: #343a40;
+$mermaid-label-fg-color: #212529;
+
 /*-- scss:rules --*/
 
 // HEIG-VD logo above the title on the title slide (embedded so the
@@ -33,4 +37,16 @@ $presentation-heading-font-weight: 600;
 // Footer matches the muted trail on the site
 .reveal .footer {
   color: #6c757d;
+}
+
+// Mermaid draws a sequence diagram at its natural width (~450px); scale
+// it up to fill the slide height instead
+.reveal svg.mermaid-js {
+  max-width: 100% !important;
+  width: auto;
+  height: 470px;
+}
+
+.reveal .column svg.mermaid-js {
+  height: 360px;
 }
