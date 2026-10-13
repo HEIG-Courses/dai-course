@@ -63,7 +63,8 @@ application protocol.
 - A published RFC **never changes**: a new version is a new RFC that
   *obsoletes* the old one (IMAP: RFC 3501, then RFC 9051).
 - Not every RFC is a standard: each one has a status.
-- Status and successors: `datatracker.ietf.org/doc/rfc3501`.
+- Status and successors:
+  [datatracker.ietf.org/doc/rfc3501](https://datatracker.ietf.org/doc/rfc3501).
 
 ## Some RFCs
 
