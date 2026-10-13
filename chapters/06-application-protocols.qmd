@@ -244,7 +244,8 @@ forbid it. SMTP has the same problem with the line that holds a single
 `.`, and solves it by doubling a `.` at the start of any line of text
 (section 4.5.2 of RFC 5321).
 
-With UDP, each datagram is one message, so the framing is given, as
+UDP keeps the boundaries: each datagram arrives whole or not at all. A
+protocol that sends one message per datagram needs no other framing, as
 long as every message fits in one datagram. The specification therefore
 gives a maximum size, and the receiver's buffer must be at least that
 big.
@@ -357,6 +358,9 @@ the diagram is in the repository, next to the text.
 > app. The app is simple: it allows users (with unique usernames) to
 > send small text messages (maximum 100 characters) to each other. The
 > server is in charge of sending the messages to the recipients.
+>
+> You are asked to define the application protocol that will be used by
+> the clients and the server.
 
 The complete specification is in the code examples repository,
 [`06-application-protocols/sms-protocol`]({{< var examples-url >}}/tree/main/06-application-protocols/sms-protocol).

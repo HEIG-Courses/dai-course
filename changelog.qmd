@@ -7,6 +7,13 @@ Important changes and corrected errors, newest first.
 If you read a chapter before the date of an entry, make sure you check
 the corrections.
 
+## 13 October 2026
+
+[Chapter 06](chapters/06-application-protocols.qmd), framing:
+
+- Clarification: with UDP, one message per datagram is a choice of the
+  protocol, and the specification gives a maximum size.
+
 ## 6 October 2026
 
 [Chapter 05](chapters/05-docker.qmd), instruction table:

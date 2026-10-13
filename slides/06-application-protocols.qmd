@@ -131,8 +131,7 @@ S: 221 foo.com Service closing transmission channel
 ## The decisions you make
 
 A specification answers each question **explicitly**: every answer left
-out becomes a guess in someone else's code. They go into a document of
-four sections, which comes in a few slides.
+out becomes a guess in someone else's code.
 
 :::: {.columns}
 ::: {.column width="50%"}
@@ -148,6 +147,9 @@ four sections, which comes in a few slides.
 - What about version 2?
 :::
 ::::
+
+The answers go into a document of four sections, which comes in a few
+slides.
 
 ## Transport: TCP or UDP
 
@@ -189,11 +191,12 @@ registry. Above 32768 a Linux client may already hold it.
 | **Delimiter** | Ends with a chosen character | SMTP (`\r\n`), your PW2 |
 | **Length prefix** | Starts with its length | HTTP/1.1 body, binary protocols |
 | **Connection close** | Ends when the sender closes | Daytime |
-:::
 
 - With a delimiter, the delimiter cannot appear **inside** a message:
   escape it or forbid it.
-- With UDP, one datagram is one message, if it fits.
+- With UDP, a datagram arrives whole or not at all: one message per
+  datagram needs no other framing. The spec gives a maximum size.
+:::
 
 ## Message format
 
@@ -271,10 +274,19 @@ sequenceDiagram
 
 ## Example: the SMS protocol
 
-::: {style="font-size: 0.9em"}
-Named users send short messages (at most 100 characters) to each other,
-through a server.
+> You are working for a startup that wants to create a new communication
+> app.
+>
+> The app is simple: it allows users (with unique usernames) to send
+> small text messages (maximum 100 characters) to each other. The server
+> is in charge of sending the messages to the recipients.
+>
+> You are asked to define the application protocol that will be used by
+> the clients and the server.
 
+## The SMS protocol in short
+
+::: {style="font-size: 0.9em"}
 - TCP, port 6435, UTF-8, one message per line ending with `\n`.
 - `JOIN <name>`: `OK`, or `ERROR 1` if the name is taken.
 - `LIST`: `CLIENTS alice bob`.
