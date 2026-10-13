@@ -123,13 +123,16 @@ S: 221 foo.com Service closing transmission channel
 
 - **Order**: `MAIL`, then `RCPT`, then `DATA`.
 - **Errors**: `550` for Green, Jones and Brown still get the mail.
-- **Extensions**: listed in the answer to `EHLO`.
+- **Extensions**: the server answers `EHLO` with what it supports
+  (`8BITMIME`, `SIZE`, `DSN`). The client uses only those, and an old
+  client ignores the lines it does not know.
 - **End**: `QUIT`, then the server closes the connection.
 
 ## The decisions you make
 
 A specification answers each question **explicitly**: every answer left
-out becomes a guess in someone else's code.
+out becomes a guess in someone else's code. They go into a document of
+four sections, which comes in a few slides.
 
 :::: {.columns}
 ::: {.column width="50%"}
