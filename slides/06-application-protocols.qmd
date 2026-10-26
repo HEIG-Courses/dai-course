@@ -179,18 +179,19 @@ registry. Above 32768 a Linux client may already hold it.
   the server in SMTP, the client in HTTP. Say which.
 - Say **who closes**, and when: after `QUIT`, after the answer, when
   the client leaves.
-- **Encoding**: write it down. UTF-8.
+- **Encoding**: any one, as long as the spec names it. Default choice:
+  UTF-8 (all characters, compatible with ASCII).
 - A length limit says what it counts: 100 characters in UTF-8 can take
   400 bytes.
 
 ## Framing: where a message ends
 
-::: {style="font-size: 0.85em"}
+::: {style="font-size: 0.75em"}
 | Framing | How | Examples |
 |---|---|---|
 | **Delimiter** | Ends with a chosen character | SMTP (`\r\n`), your PW2 |
 | **Length prefix** | Starts with its length | HTTP/1.1 body, binary protocols |
-| **Connection close** | Ends when the sender closes | Daytime |
+| **Connection close** | Everything until the sender closes the connection | Daytime |
 
 - With a delimiter, the delimiter cannot appear **inside** a message:
   escape it or forbid it.

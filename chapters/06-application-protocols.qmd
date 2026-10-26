@@ -220,10 +220,12 @@ client decides to leave.
 
 ### Encoding
 
-Text is bytes in an encoding ([chapter 04](04-java-io.qmd)). Write it
-in the specification: **UTF-8**. Then any limit on the length of a text
-must say what it counts: 100 characters in UTF-8 can take up to 400
-bytes.
+Text is bytes in an encoding ([chapter 04](04-java-io.qmd)). Both
+sides must use the same one, so the specification names it. Choose
+**UTF-8** unless you have a reason not to: it encodes every Unicode
+character, and ASCII text is already valid UTF-8. Then any limit on the
+length of a text must say what it counts: 100 characters in UTF-8 can
+take up to 400 bytes.
 
 ### Framing: where a message ends
 
