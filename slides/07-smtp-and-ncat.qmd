@@ -182,9 +182,10 @@ v=spf1 ip4:193.134.218.124 ip4:145.232.233.54 ip4:185.144.39.35/32
 ```
 :::
 
-- `ip4:`: addresses allowed to send.
-- `include:`: the addresses of another domain's SPF record too.
-- `-all`: every other address fails (`~all`: accept, mark as suspect).
+- `ip4:...` gives an address allowed to send.
+- `include:...` allows the addresses of another domain's SPF record too.
+- `-all` makes every other address fail (`~all`: accept, but mark as
+  suspect).
 
 Spammers on your server: your IP on **blocklists**. Most companies
 and schools let Microsoft or Google run their mail.

@@ -258,13 +258,13 @@ dig +short heig-vd.ch TXT
 (other `TXT` records of the domain, which prove ownership to various
 services, are left out here)
 
-- `v=spf1`: this `TXT` record is an SPF policy.
-- `ip4:...`: addresses allowed to send.
-- `include:...`: the addresses listed in the SPF record of another
-  domain are allowed too, here Microsoft's servers and those of a
+- `v=spf1` says that this `TXT` record is an SPF policy.
+- `ip4:...` gives an address allowed to send.
+- `include:...` allows the addresses listed in the SPF record of
+  another domain too, here Microsoft's servers and those of a
   newsletter service.
-- `-all`: every other address fails. `~all` would mean "probably not
-  allowed, accept but mark as suspect".
+- `-all` makes every other address fail. `~all` would mean "probably
+  not allowed, accept but mark as suspect".
 
 Running your own mail server takes work: if spammers use it, its IP
 address lands on **blocklists**, and the other servers refuse its mail.
