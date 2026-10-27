@@ -15,10 +15,6 @@ subtitle: "DAI · A network application with TCP or UDP"
 - Be creative, but reasonable: the point is the protocol and the
   network code.
 
-::: {.callout-warning}
-Draft: the subject and the grading criteria may still change slightly
-before the kickoff.
-:::
 :::
 
 ## Why this project
@@ -352,8 +348,8 @@ void refusesListBeforeJoin() {
   Focus on the **what** and the **why**, for someone who knows the course
   but not your project.
 
-[Practical work 2](../practical-work/pw2.qmd) has everything: milestones,
-rules, the full grid.
+[Practical work 2](../practical-work/pw2.qmd) has everything: the demos,
+the rules, the full grid.
 
 ## Credits
 
