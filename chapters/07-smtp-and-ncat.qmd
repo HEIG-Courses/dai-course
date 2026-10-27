@@ -66,10 +66,11 @@ below.
 
 ### Port numbers
 
-An IP address identifies a machine; a **port** identifies a program on
-that machine. Think of a street address and an apartment number. A port
-is a 16-bit number, from 0 to 65535, given separately for TCP and for
-UDP. The ranges ([chapter 06](06-application-protocols.qmd#port)) and
+An **IP address** identifies a machine; a **port** identifies a
+program on that machine. Think of a street address and an apartment
+number. A port is a 16-bit number, from 0 to 65535. TCP and UDP each
+have their own ports: TCP port 53 and UDP port 53 are two different
+ports, which two different programs can use. The ranges ([chapter 06](06-application-protocols.qmd#port)) and
 some well-known examples:
 
 | Range | Examples |

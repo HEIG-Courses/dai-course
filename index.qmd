@@ -57,13 +57,13 @@ evolves. Regenerate the date skeleton after a GAPS change with:
 | 4 | 05.10 | [Docker & Compose](chapters/05-docker.qmd) | [Slides](slides/05-docker.qmd) | 06.10 | [PW1](practical-work/pw1.qmd) |  |
 | ⏰ 5 | 12.10 | [PW1](practical-work/pw1.qmd) |  | 13.10 | [PW1](practical-work/pw1.qmd) presentations |  |
 |  | 19.10 | *Semaine de travail personnel* |  | 20.10 | *no class* |  |
-| 6 | 26.10 | [Application protocols](chapters/06-application-protocols.qmd) | [Slides](slides/06-application-protocols.qmd) | 27.10 | [PW2](practical-work/pw2.qmd) kickoff | [Slides](slides/pw2.qmd) |
-| 7 | 02.11 | [TCP & UDP programming (1/2)](chapters/08-tcp-and-udp.qmd) | [Part 1](slides/08-tcp-programming.qmd) | 03.11 | [PW2](practical-work/pw2.qmd) |  |
+| 6 | 26.10 | [Application protocols](chapters/06-application-protocols.qmd) | [Slides](slides/06-application-protocols.qmd) | 27.10 | [SMTP & ncat](chapters/07-smtp-and-ncat.qmd) | [Slides](slides/07-smtp-and-ncat.qmd) |
+| 7 | 02.11 | [TCP & UDP programming (1/2)](chapters/08-tcp-and-udp.qmd) | [Part 1](slides/08-tcp-programming.qmd) | 03.11 | [PW2](practical-work/pw2.qmd) kickoff | [Slides](slides/pw2.qmd) |
 | 8 | 09.11 | [TCP & UDP programming (2/2)](chapters/08-tcp-and-udp.qmd) | [Part 2](slides/08-udp-programming.qmd) | 10.11 | [PW2](practical-work/pw2.qmd) |  |
 | 9 | 16.11 | Network concurrency |  | 17.11 | [PW2](practical-work/pw2.qmd) |  |
 | 10 | 23.11 | **Mid-term evaluation (TE1)** |  | 24.11 | [PW2](practical-work/pw2.qmd) |  |
-| ⏰ 11 | 30.11 | SSH & SCP |  | 01.12 | [PW2](practical-work/pw2.qmd) |  |
-| 12 | 07.12 | HTTP & curl |  | 08.12 | [PW3](practical-work/pw3.qmd) |  |
+| 11 | 30.11 | SSH & SCP |  | 01.12 | [PW2](practical-work/pw2.qmd) |  |
+| ⏰ 12 | 07.12 | HTTP & curl |  | 08.12 | [PW2](practical-work/pw2.qmd) presentations |  |
 | 13 | 14.12 | Web infrastructures |  | 15.12 | [PW3](practical-work/pw3.qmd) |  |
 |  | 21.12–08.01 | *Winter break* |  |  | *no class* |  |
 | 14 | 11.01 | Caching & performance |  | 12.01 | [PW3](practical-work/pw3.qmd) |  |

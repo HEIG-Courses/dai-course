@@ -38,8 +38,10 @@ Address: 193.134.223.20
 
 ## Reminder: ports
 
-- IP address = street address; **port** = apartment number: one
-  program on the machine. 16 bits, 0 to 65535, TCP and UDP separately.
+- **IP address** = street address; **port** = apartment number: one
+  program on the machine. 16 bits, 0 to 65535.
+- TCP and UDP each have their own ports: TCP port 53 and UDP port 53
+  are two different ports.
 
 ::: {style="font-size: 0.7em"}
 | Range | Examples |

@@ -265,7 +265,7 @@ too small or too large.
 Your work is due:
 
 - DAI-TIC-A: **Tuesday 01.12, 23:59**.
-- DAI-TIC-C: **Monday 30.11, 23:59**.
+- DAI-TIC-C: **Monday 07.12, 23:59**.
 
 Update the Discussion you opened at the start with:
 
@@ -277,7 +277,7 @@ The penalties are in the [Rules](#rules).
 ## Presentations
 
 - DAI-TIC-A: **Wednesday 02.12**.
-- DAI-TIC-C: **Tuesday 01.12**.
+- DAI-TIC-C: **Tuesday 08.12**.
 
 Each group has **8 minutes** to present its application. Come 5 minutes
 before your slot, with your computer. A video projector is available.
