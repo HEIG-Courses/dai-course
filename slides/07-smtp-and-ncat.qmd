@@ -52,16 +52,6 @@ Address: 193.134.223.20
 : {tbl-colwidths="[28,72]"}
 :::
 
-## How an email travels
-
-```{mermaid}
-flowchart LR
-    B["Bob's MUA"] -- "SMTP, 587 or 465" --> MSA["Bob's server<br>(MSA, then MTA)"]
-    MSA -- "MX of gmail.com?" --> DNS[(DNS)]
-    MSA -- "SMTP, 25" --> MTA["Alice's server<br>(MTA, mailbox)"]
-    MTA -- "IMAP or POP3" --> A["Alice's MUA"]
-```
-
 ## Who is who
 
 - **MUA**, Mail User Agent: the mail program of a person
@@ -72,6 +62,16 @@ flowchart LR
   the domain of the recipient.
 - **Mailbox**: stores the mails until the MUA fetches them.
 - MSA and MTA are often the same server program, with two roles.
+
+## How an email travels
+
+```{mermaid}
+flowchart LR
+    B["Bob's MUA"] -- "SMTP, 587 or 465" --> MSA["Bob's server<br>(MSA, then MTA)"]
+    MSA -- "MX of gmail.com?" --> DNS[(DNS)]
+    MSA -- "SMTP, 25" --> MTA["Alice's server<br>(MTA, mailbox)"]
+    MTA -- "IMAP or POP3" --> A["Alice's MUA"]
+```
 
 ## The commands at each step
 
