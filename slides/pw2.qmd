@@ -133,13 +133,13 @@ Received average: 1003.83
   - the link to your repository,
   - the **commit hash** you want us to grade.
 - Due: DAI-TIC-A **Tuesday 01.12, 23:59**; DAI-TIC-C **Monday
-  07.12, 23:59**.
+  30.11, 23:59**.
 - The penalties are in the rules.
 
 ## Presentations
 
 ::: {style="font-size: 0.8em"}
-- DAI-TIC-A: **Wednesday 02.12**. DAI-TIC-C: **Tuesday 08.12**.
+- DAI-TIC-A: **Wednesday 02.12**. DAI-TIC-C: **Tuesday 01.12**.
 - **8 minutes** per group. Come 5 minutes before your slot, with your
   computer. A video projector is available.
 - Present as you like, but:
