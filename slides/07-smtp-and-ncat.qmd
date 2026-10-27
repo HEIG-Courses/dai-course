@@ -12,7 +12,9 @@ subtitle: "DAI · Chapter 07"
 - Use a mock server, and send an email by hand with `ncat`.
 - Read a small Java SMTP client.
 
-## Reminder: IP addresses
+# A quick reminder about networking
+
+## IP addresses
 
 - Each machine on the Internet has an **IP address**.
 - IPv4 (`193.134.223.20`): 32 bits, not enough for every device.
@@ -20,7 +22,7 @@ subtitle: "DAI · Chapter 07"
   machines, like your home router.
 - **IPv6** (`2001:db8::1`): 128 bits, made to solve the shortage.
 
-## Reminder: names and the DNS
+## Names and the DNS
 
 - The **DNS** translates names into addresses (and more).
 
@@ -36,7 +38,17 @@ Address: 193.134.223.20
 
 - Your browser does this lookup before it connects.
 
-## Reminder: ports
+## DNS records
+
+| Type | Gives |
+|---|---|
+| `A`, `AAAA` | An IPv4, IPv6 address |
+| `CNAME` | An alias |
+| `NS` | The DNS servers of the domain |
+| `MX` | The servers that receive the mail of the domain |
+| `TXT` | Free text, used for policies such as SPF |
+
+## Ports and programs
 
 - **IP address** = street address; **port** = apartment number: one
   program on the machine. 16 bits, 0 to 65535.
@@ -51,6 +63,8 @@ Address: 193.134.223.20
 | 49152-65535, dynamic | Never registered: temporary connections, private services (51820 WireGuard) |
 : {tbl-colwidths="[28,72]"}
 :::
+
+# Electronic messaging protocols
 
 ## Who is who
 
@@ -73,23 +87,6 @@ flowchart LR
     MTA -- "IMAP or POP3" --> A["Alice's MUA"]
 ```
 
-## The commands at each step
-
-```{mermaid}
-sequenceDiagram
-    participant B as Bob's MUA
-    participant S1 as Bob's server
-    participant S2 as Alice's server
-    participant A as Alice's MUA
-    B->>S1: EHLO, MAIL FROM, RCPT TO
-    B->>S1: DATA, message, QUIT
-    Note over S1: stores, finds MX
-    S1->>S2: EHLO, MAIL FROM, RCPT TO
-    S1->>S2: DATA, message, QUIT
-    Note over S2: stores in mailbox
-    A->>S2: fetch (IMAP or POP3)
-```
-
 ## SMTP sends, IMAP and POP3 read
 
 - **SMTP** pushes a mail one step further, up to the mailbox.
@@ -99,7 +96,7 @@ sequenceDiagram
 - A webmail is a MUA running on the server: your browser speaks HTTP,
   the webmail often IMAP.
 
-## Ports
+## Mail ports
 
 ::: {style="font-size: 0.8em"}
 | Protocol | Use | Plain text | TLS from the start |
@@ -114,15 +111,7 @@ sequenceDiagram
   private. 465, 995, 993: TLS at once.
 - So ncat can talk to 25 and 587 only.
 
-## DNS records
-
-| Type | Gives |
-|---|---|
-| `A`, `AAAA` | An IPv4, IPv6 address |
-| `CNAME` | An alias |
-| `NS` | The DNS servers of the domain |
-| `MX` | The servers that receive the mail of the domain |
-| `TXT` | Free text, used for policies such as SPF |
+# DNS records related to email
 
 ## Where does the mail of a domain go?
 
@@ -137,6 +126,8 @@ dig +short heig-vd.ch MX
 - Microsoft's servers receive the mail of HEIG-VD.
 - `0`: the **preference**. With several MX records, the lowest number
   is tried first.
+
+# Security concerns and spam
 
 ## Envelope and message
 
@@ -232,53 +223,24 @@ mailpit-1 | ... msg="[smtpd] response (192.168.65.1) 503 5.5.1
 - Mailpit logs each **error** it answers, not the mails it accepts
   (those are in the web interface).
 
-## ncat
+# A focus on the SMTP protocol
 
-Opens a TCP connection, sends what you type, prints what it receives.
-The protocol is you.
+## The commands at each step
 
-```sh
-# Client
-ncat -C localhost 1025
-
-# Server: listen on 2525, print what the client sends
-ncat -l -C 2525
+```{mermaid}
+sequenceDiagram
+    participant B as Bob's MUA
+    participant S1 as Bob's server
+    participant S2 as Alice's server
+    participant A as Alice's MUA
+    B->>S1: EHLO, MAIL FROM, RCPT TO
+    B->>S1: DATA, message, QUIT
+    Note over S1: stores, finds MX
+    S1->>S2: EHLO, MAIL FROM, RCPT TO
+    S1->>S2: DATA, message, QUIT
+    Note over S2: stores in mailbox
+    A->>S2: fetch (IMAP or POP3)
 ```
-
-- `-C`: each line ends with `\r\n`, as SMTP requires.
-- Install: `sudo apt install ncat` (Ubuntu, WSL), `brew install nmap`
-  (macOS).
-- Alternatives: `nc`, `telnet` (check their CR LF option).
-
-## Sending an email by hand
-
-::: {style="font-size: 0.6em"}
-```text
-S: 220 a825881dcf8e Mailpit ESMTP Service ready
-C: EHLO my-laptop.local
-S: 250-a825881dcf8e greets my-laptop.local
-S: 250-SIZE 52428800
-S: 250-ENHANCEDSTATUSCODES
-S: 250-8BITMIME
-S: 250 SMTPUTF8
-C: MAIL FROM:<alice@example.com>
-S: 250 2.1.0 Ok
-C: RCPT TO:<bob@example.com>
-S: 250 2.1.5 Ok
-C: DATA
-S: 354 Start mail input; end with <CR><LF>.<CR><LF>
-C: From: Alice <alice@example.com>
-C: To: Bob <bob@example.com>
-C: Subject: Hello from ncat
-C:
-C: Hi Bob,
-C: this mail was typed by hand.
-C: .
-S: 250 2.0.0 Ok: queued as 0WN74Fza0O8ED2H17pjg9l
-C: QUIT
-S: 221 2.0.0 a825881dcf8e Mailpit ESMTP Service closing transmission channel
-```
-:::
 
 ## The commands
 
@@ -310,6 +272,26 @@ S: 503 5.5.1 Bad sequence of commands (MAIL required before RCPT)
 ```
 :::
 
+# ncat
+
+## ncat
+
+Opens a TCP connection, sends what you type, prints what it receives.
+The protocol is you.
+
+```sh
+# Client
+ncat -C localhost 1025
+
+# Server: listen on 2525, print what the client sends
+ncat -l -C 2525
+```
+
+- `-C`: each line ends with `\r\n`, as SMTP requires.
+- Install: `sudo apt install ncat` (Ubuntu, WSL), `brew install nmap`
+  (macOS).
+- Alternatives: `nc`, `telnet` (check their CR LF option).
+
 ## Why `-C` matters
 
 - Without `-C`, the terminal sends `\n` alone.
@@ -317,6 +299,36 @@ S: 503 5.5.1 Bad sequence of commands (MAIL required before RCPT)
 - ...but the end of the mail must be exactly `\r\n.\r\n`.
 - Without `-C`, the `.` is one more line of text: the server waits
   until its timeout (5 minutes in Mailpit).
+
+## Sending an email by hand
+
+::: {style="font-size: 0.6em"}
+```text
+S: 220 a825881dcf8e Mailpit ESMTP Service ready
+C: EHLO my-laptop.local
+S: 250-a825881dcf8e greets my-laptop.local
+S: 250-SIZE 52428800
+S: 250-ENHANCEDSTATUSCODES
+S: 250-8BITMIME
+S: 250 SMTPUTF8
+C: MAIL FROM:<alice@example.com>
+S: 250 2.1.0 Ok
+C: RCPT TO:<bob@example.com>
+S: 250 2.1.5 Ok
+C: DATA
+S: 354 Start mail input; end with <CR><LF>.<CR><LF>
+C: From: Alice <alice@example.com>
+C: To: Bob <bob@example.com>
+C: Subject: Hello from ncat
+C:
+C: Hi Bob,
+C: this mail was typed by hand.
+C: .
+S: 250 2.0.0 Ok: queued as 0WN74Fza0O8ED2H17pjg9l
+C: QUIT
+S: 221 2.0.0 a825881dcf8e Mailpit ESMTP Service closing transmission channel
+```
+:::
 
 ## A Java SMTP client
 
