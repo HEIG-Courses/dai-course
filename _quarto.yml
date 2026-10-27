@@ -27,6 +27,10 @@ website:
             text: "05 · Docker & Compose"
           - href: chapters/06-application-protocols.qmd
             text: "06 · Application protocols"
+          - href: chapters/07-smtp-and-ncat.qmd
+            text: "07 · SMTP & ncat"
+          - href: chapters/08-tcp-and-udp.qmd
+            text: "08 · TCP & UDP programming"
       - section: "Practical work"
         contents:
           - href: practical-work/pw1.qmd

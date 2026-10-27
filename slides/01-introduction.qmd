@@ -45,6 +45,7 @@ subtitle: "DAI · Chapter 01"
 
 ## What does GAPS say (2/3)
 
+::: {style="font-size: 0.85em"}
 > **Programmation réseau**
 >
 > - concevoir une application client-serveur ;
@@ -56,6 +57,8 @@ subtitle: "DAI · Chapter 01"
 > - connaître les concepts principaux du protocole ;
 > - concevoir et réaliser une infrastructure HTTP avec un reverse proxy et
 >   plusieurs serveurs ;
+> - implémenter le protocole en utilisant la Socket API ;
+:::
 
 ## What does GAPS say (3/3)
 

@@ -1,30 +1,498 @@
 ---
-title: "Practical work 2: Network application with TCP/UDP"
+title: "Practical work 2: a network application with TCP or UDP"
 ---
 
 ::: {.callout-warning}
-Work in progress: subject, milestones and grading rubric will be
-published before the practical work starts.
+Draft: the subject and the grading criteria may still change slightly
+before the kickoff.
 :::
 
 ## Overview
 
-Design an application protocol and implement it, in groups, as a Java
-client/server application using TCP and/or UDP sockets, with concurrency,
-dockerised.
+Network applications are everywhere: to chat, to play, to watch videos,
+to send emails. In this practical work, you create your own, in a group.
 
-Covers chapters: Application protocols · SMTP & ncat · TCP & UDP
-programming · Network concurrency.
+Your network application is made of an **application protocol** and two
+programs that communicate over the network with it: a **server** and a
+**client**, written in Java. You define the protocol, and you choose the
+transport protocol it uses: TCP, UDP, or both.
 
-## Milestones
+**You choose what the application does.** A chat, a chess game, a
+shopping list, the simulation of an Internet of Things (IoT) network,
+and so on. Be creative, but reasonable: the point is the protocol and
+the network code.
 
-| Session | Goal |
-|---------|------|
-| 1 | *TBD* |
-| 2 | *TBD* |
-| 3 | *TBD* |
-| 4 | *TBD* (final submission) |
+This practical work puts into practice
+[chapter 06](../chapters/06-application-protocols.qmd) (Application
+protocols), the TCP & UDP programming chapters and the Network
+concurrency chapter. The application is packaged and published with
+Docker, as in [chapter 05](../chapters/05-docker.qmd).
+
+## Objectives
+
+- Define an application protocol, in a specification another team could
+  implement.
+- Implement the protocol as a client and a server, with TCP and/or UDP.
+- Serve several clients at the same time.
+- Package, publish and run the application with Docker.
+- Explain your work, in the README and in front of the class.
+
+## Demos
+
+Two demos, shown at the kickoff, give an idea of a finished practical
+work. Each one is a Maven project with picocli; the commands below are
+run from the root of the demos repository.
+
+### Demo 1: file transfer, with TCP
+
+The server serves the files of its directory; the client lists and
+downloads them in a REPL. The server serves several clients at the same
+time, with a pool of threads.
+
+Build the project, then run the application without any arguments:
+
+```sh
+./mvnw --projects practical-work-2-tcp-demo clean package
+java -jar practical-work-2-tcp-demo/target/practical-work-2-tcp-demo-1.0-SNAPSHOT.jar
+```
+
+```{.text filename="Console"}
+Missing required subcommand
+Usage: practical-work-2-tcp-demo-1.0-SNAPSHOT.jar [-hV] [COMMAND]
+A simple file transfer application
+  -h, --help      Show this help message and exit.
+  -V, --version   Print version information and exit.
+Commands:
+  server  Start a TCP server to serve files
+  client  Start a client to download files from a server
+```
+
+Start the server, in the directory of the files to serve:
+
+```sh
+java -jar practical-work-2-tcp-demo-1.0-SNAPSHOT.jar server -p 12345 -t 4
+```
+
+Start the client, in another terminal:
+
+```sh
+java -jar practical-work-2-tcp-demo-1.0-SNAPSHOT.jar client -p 12345
+```
+
+```{.text filename="Client"}
+  _____          _____   _____           _                  _
+ |  __ \   /\   |_   _| |  __ \         | |                | |
+ | |  | | /  \    | |   | |__) | __ ___ | |_ ___   ___ ___ | |
+ | |  | |/ /\ \   | |   |  ___/ '__/ _ \| __/ _ \ / __/ _ \| |
+ | |__| / ____ \ _| |_  | |   | | | (_) | || (_) | (_| (_) | |
+ |_____/_/    \_\_____| |_|   |_|  \___/ \__\___/ \___\___/|_|
+
+You are connected to server on port 12345 with IP address localhost.
+
+Available commands:
+LS - list available files on server
+GET <file> - get file from server
+QUIT - quit the client
+
+> LS
+Available files on server:
+demo.txt
+notes.txt
+> GET demo.txt
+Downloading file from server...
+File saved to demo.txt
+> GET not-found.txt
+The specified file was not found on the server.
+> QUIT
+Bye.
+```
+
+```{.text filename="Server"}
+Starting server on port 12345 with thread pool size 4.
+New client connected from 127.0.0.1:50943
+Client disconnected
+```
+
+### Demo 2: weather station, with UDP
+
+Sensors (thermometer, humidity, pressure) send their measures to
+multicast groups, fire and forget: `239.0.0.1` for the temperature,
+`239.0.0.2` for the pressure, `239.0.0.3` for the humidity, all on port
+9876. The weather station joins the groups and keeps the measures. A
+client asks the station, in unicast on port 1234, for all the measures
+of a sensor or their average.
+
+Build the project, then run the application without any arguments:
+
+```sh
+./mvnw --projects practical-work-2-udp-demo clean package
+java -jar practical-work-2-udp-demo/target/practical-work-2-udp-demo-1.0-SNAPSHOT.jar
+```
+
+```{.text filename="Console"}
+Missing required subcommand
+Usage: practical-work-2-udp-demo-1.0-SNAPSHOT.jar [-hV] [COMMAND]
+DAI Weather Station
+  -h, --help      Show this help message and exit.
+  -V, --version   Print version information and exit.
+Commands:
+  thermometer-emitter      Emits temperature values.
+  pressure-emitter         Emits pressure values.
+  humidity-emitter         Emits humidity values.
+  weather-station          Start an UDP multicast receiver
+  weather-client           Start an UDP weather client
+  list-network-interfaces  List all available network interfaces
+```
+
+Start the weather station, on the network interface of your machine
+(`en0` on a Mac, `eth0` on Linux):
+
+```sh
+java -jar practical-work-2-udp-demo-1.0-SNAPSHOT.jar weather-station \
+  -i en0 --port 9876 --server-port 1234
+```
+
+```{.text filename="Weather station"}
+Multicast receiver started (127.0.0.1:9876)
+Unicast receiver started (127.0.0.1:1234)
+```
+
+Start two sensors, each in its own terminal; each one sends a measure
+every 10 seconds:
+
+```sh
+java -jar practical-work-2-udp-demo-1.0-SNAPSHOT.jar thermometer-emitter \
+  --delay=0 --frequency 10000 -i en0 -p 9876
+java -jar practical-work-2-udp-demo-1.0-SNAPSHOT.jar pressure-emitter \
+  --delay=0 --frequency 10000 -i en0 -p 9876
+```
+
+```{.text filename="Thermometer"}
+Emitter of type thermometer started (127.0.0.1:9876).
+Multicasting measure : 1.0 to 239.0.0.1:9876 on interface en0
+Multicasting measure : 38.0 to 239.0.0.1:9876 on interface en0
+Multicasting measure : 12.0 to 239.0.0.1:9876 on interface en0
+Multicasting measure : 32.0 to 239.0.0.1:9876 on interface en0
+Multicasting measure : 22.0 to 239.0.0.1:9876 on interface en0
+```
+
+```{.text filename="Pressure sensor"}
+Emitter of type pressure started (127.0.0.1:9876).
+Multicasting measure : 1033.0 to 239.0.0.2:9876 on interface en0
+Multicasting measure : 1027.0 to 239.0.0.2:9876 on interface en0
+Multicasting measure : 1019.0 to 239.0.0.2:9876 on interface en0
+Multicasting measure : 950.0 to 239.0.0.2:9876 on interface en0
+Multicasting measure : 964.0 to 239.0.0.2:9876 on interface en0
+```
+
+Start the client, and ask for the temperatures, then for the average
+pressure:
+
+```sh
+java -jar practical-work-2-udp-demo-1.0-SNAPSHOT.jar weather-client
+```
+
+```{.text filename="Client"}
+Welcome to the weather client!
+Please enter the measures you want to get
+1. Temperature
+2. Humidity
+3. Pressure
+4. Quit
+> 1
+List all measures (1) or only the average? (2)
+> 1
+----------------------------------------
+Received measures: [1.0, 38.0, 12.0, 32.0, 22.0]
+----------------------------------------
+Please enter the measures you want to get
+1. Temperature
+2. Humidity
+3. Pressure
+4. Quit
+> 3
+List all measures (1) or only the average? (2)
+> 2
+----------------------------------------
+Received average: 1003.83
+----------------------------------------
+Please enter the measures you want to get
+1. Temperature
+2. Humidity
+3. Pressure
+4. Quit
+> 4
+```
+
+## Groups
+
+You work in groups of **two to three** students. You choose your
+partners. If you have no partner, we assign you one.
+
+To announce your group, open a **GitHub Discussion** in the
+[course organization]({{< var discussions-url >}}), category *Show and
+tell*, with:
+
+- **Title**: `[DAI {{< var year >}} Class <A or C>] PW2 - <first name> <last name>, …`
+- **Description**: a few lines about what your application will do.
+
+::: {.callout-important}
+Do this before the next course, even if your idea is not final. We
+use it to plan the presentations, and to tell you early if the scope is
+too small or too large.
+:::
+
+## What your application must do
+
+- Follow an **application protocol you define**, in a specification
+  with the four sections of
+  [chapter 06](../chapters/06-application-protocols.qmd#writing-a-specification).
+  The [SMS protocol]({{< var examples-url >}}/tree/main/06-application-protocols/sms-protocol)
+  is a model.
+- Offer two commands with picocli: one starts the **server**, the other
+  the **client**.
+- Give the client a **REPL** (Read-Eval-Print Loop): the user types
+  commands and reads the answers without leaving the application.
+- Accept **several clients at the same time** on the server. If you
+  cannot find an idea where several clients make sense, ask us.
+- Be **packaged with Docker** and published on GitHub Container
+  Registry.
+- Be **slightly more than the course examples**, and slightly different.
+  No need to shoot for the moon.
+
+## Submission
+
+Your work is due:
+
+- DAI-TIC-A: **Tuesday 01.12, 23:59**.
+- DAI-TIC-C: **Monday 30.11, 23:59**.
+
+Update the Discussion you opened at the start with:
+
+- the link to your repository,
+- the **commit hash** you want us to grade.
+
+The penalties are in the [Rules](#rules).
+
+## Presentations
+
+- DAI-TIC-A: **Wednesday 02.12**.
+- DAI-TIC-C: **Tuesday 01.12**.
+
+Each group has **8 minutes** to present its application. Come 5 minutes
+before your slot, with your computer. A video projector is available.
+
+You are free to present as you like, but:
+
+- show the client and the server **running**, including an error case.
+- explain the **protocol** and the choices behind it, not every line of
+  code.
+- everyone speaks, and everyone can answer questions about the code.
+
+The timeslots are published here once the groups are known.
 
 ## Grading
 
-*Rubric TBD.*
+Each criterion is worth:
+
+- **0 point**: missing, off topic, or showing very little understanding.
+- **0.1 point**: partially there, unclear or incomplete.
+- **0.2 point**: complete, correct, and showing a clear understanding.
+
+Final grade: 25 criteria × 0.2 = 5 points, + 1 = **6 maximum**.
+
+| Category | Criteria | Points | Weight |
+|----------|----------|-------:|-------:|
+| 1. Docker and GitHub Container Registry | 1 to 4 | 0.8 | 16% |
+| 2. Application protocol | 5 to 12 | 1.6 | 32% |
+| 3. Network programming | 13 to 18 | 1.2 | 24% |
+| 4. Network concurrency | 19 to 20 | 0.4 | 8% |
+| 5. Tests | 21 | 0.2 | 4% |
+| 6. Presentation | 22 to 25 | 0.8 | 16% |
+
+The good practices of PW1 (Git, GitHub, README, Maven) are expected,
+and missing ones cost points: see the [Rules](#rules).
+
+### Category 1: Docker and GitHub Container Registry
+
+| # | Criterion | Points |
+|---|-----------|-------:|
+| 1 | The application is packaged with Docker, using a Dockerfile. | 0.2 |
+| 2 | The image is published on GitHub Container Registry, and it is public. | 0.2 |
+| 3 | The README gives the explicit commands[^explicit-commands] to build the image and publish it on GitHub Container Registry. | 0.2 |
+| 4 | The README gives the explicit commands[^explicit-commands] to run the server and the client with Docker, so that a new user needs nothing else than Docker (`docker run` is enough, no need for Docker Compose). | 0.2 |
+
+### Category 2: Application protocol
+
+| # | Criterion | Points |
+|---|-----------|-------:|
+| 5 | The specification is in the repository, linked from the README, and gives an overview of the application. | 0.2 |
+| 6 | The specification gives the transport protocol (TCP and/or UDP), and justifies the choice. | 0.2 |
+| 7 | The specification gives the port and the encoding. | 0.2 |
+| 8 | The specification defines where a message ends. | 0.2 |
+| 9 | The specification describes each message, with its syntax, its parameters and all its responses. | 0.2 |
+| 10 | The specification defines the error codes, and the answer to an unknown message and to a message sent at the wrong time. | 0.2 |
+| 11 | The application protocol is described using at least one successful communication example diagram. | 0.2 |
+| 12 | The application protocol is described using at least one unsuccessful/error communication example diagram. | 0.2 |
+
+### Category 3: Network programming
+
+| # | Criterion | Points |
+|---|-----------|-------:|
+| 13 | The server listens on the port of the specification by default, and the client connects to a given host on that port by default. picocli options change both. | 0.2 |
+| 14 | The client offers a REPL to interact with the server without leaving the application. | 0.2 |
+| 15 | The server processes the messages as the specification defines them. | 0.2 |
+| 16 | The client processes the messages as the specification defines them. | 0.2 |
+| 17 | The client and the server release their resources when a problem occurs, or when one side closes the connection. | 0.2 |
+| 18 | The application displays explicit error messages[^explicit-error-messages] on invalid inputs and on network errors. | 0.2 |
+
+### Category 4: Network concurrency
+
+| # | Criterion | Points |
+|---|-----------|-------:|
+| 19 | The server accepts several clients at the same time. | 0.2 |
+| 20 | The data structures shared between clients are safe under concurrent accesses. | 0.2 |
+
+### Category 5: Tests
+
+| # | Criterion | Points |
+|---|-----------|-------:|
+| 21 | The protocol logic is separated from the network code and covered by JUnit tests that run with `./mvnw test` on any machine, including an invalid message. | 0.2 |
+
+### Category 6: Presentation
+
+| # | Criterion | Points |
+|---|-----------|-------:|
+| 22 | The presentation is clear, prepared, and fits in the allotted time. | 0.2 |
+| 23 | The demo shows the client and the server running, including an error case. | 0.2 |
+| 24 | The presentation explains the protocol and the choices behind it (transport, port, framing, errors), with a diagram. | 0.2 |
+| 25 | Everyone speaks, and everyone can answer questions about any part of the code. | 0.2 |
+
+## How to test your protocol
+
+As in PW1, test the logic, not the network: keep what the server does
+with a message separate from the code that reads and writes the socket.
+A simple way is a method that takes the line received and returns the
+answer to send. The network code only reads lines, calls it, and writes
+the answers.
+
+The tests then need no server and no client. With the
+[SMS protocol]({{< var examples-url >}}/tree/main/06-application-protocols/sms-protocol):
+
+```java
+@Test
+void answersAnUnknownMessageWithAnError() {
+  Session session = new Session();
+  assertEquals("ERROR -1", session.handle("HELLO"));
+}
+
+@Test
+void refusesListBeforeJoin() {
+  Session session = new Session();
+  assertEquals("ERROR -2", session.handle("LIST"));
+}
+```
+
+## Rules
+
+Your practical work must respect the following rules.
+
+**The team**
+
+- Everyone contributes to the project, and the history shows it.
+- Everyone can explain the whole project in detail if we ask, not only
+  the part they wrote.
+
+**The project**
+
+- A GitHub Discussion is opened **before the next course**, so that we
+  can validate your idea.
+- The network communication uses only the **Java classes of the
+  course**. Any other library may serve the rest of the application,
+  the user interface for example. The README says which dependencies
+  you use, and why.
+- The application does **slightly more, and something slightly
+  different**, than the examples shown in the course.
+- The good practices of PW1 continue: issues, reviewed pull requests,
+  descriptive and signed commits, the Maven wrapper, a clean
+  `.gitignore`, and a README that explains how to build and run the
+  application.
+- The application **builds and runs from a fresh clone**, with
+  `./mvnw clean package`, on a machine that is not yours. What we cannot
+  build, we cannot grade.
+
+**The submission**
+
+- The Discussion is updated with the **repository link and the commit
+  hash** before the deadline. We grade that commit, not what comes
+  after it.
+- If the repository is **private**, the teaching staff are
+  collaborators. If we cannot open it at the deadline, the work counts
+  as not submitted.
+- Every started day of delay costs **1 point**.
+
+**Honesty**
+
+- State your sources: code from the internet, code generated by an AI
+  tool, ideas taken elsewhere. Say what you used them for. See the
+  [AI principles](../resources.qmd).
+- Copying the code of another group gives a grade of **1** to everyone
+  involved.
+
+::: {.callout-caution}
+These rules are not decoration. Not respecting one of them costs up to
+**1 point** on the final grade, and several of them can add up.
+:::
+
+## Grades and feedback
+
+Your grade goes into GAPS, and you receive an email with a comment for
+each criterion, a general comment on your work, and the grade. If
+anything is unclear, ask us.
+
+## Tips
+
+::: {.callout-tip collapse="true" title="Keep it simple"}
+Remember the Unix philosophy and the KISS principle from PW1: *keep it
+simple, silly*. A small protocol, well specified, with its errors
+handled, is worth more here than an ambitious one that half works. If
+your implementation is too complex, we may penalize it.
+:::
+
+::: {.callout-tip collapse="true" title="Make your image public"}
+A package pushed to GitHub Container Registry starts **private**. Make
+it public as in
+[chapter 05](../chapters/05-docker.qmd#publishing-to-the-github-container-registry):
+**Package settings** > **Danger Zone** > **Change visibility** >
+**Public**.
+:::
+
+::: {.callout-tip collapse="true" title="How and what to present"}
+Present your work as you like: slides, a live demo, a poster. But:
+
+- no need to repeat the objectives, we know them.
+- no need to walk through the code, unless a part of it is interesting,
+  complex or tricky.
+- focus on the **what** and the **why**.
+
+Aim at someone who knows the course but has never heard of your
+project.
+:::
+
+## Sources
+
+- O. Tischhauser, with the help of
+  [Claude](https://claude.com) (Anthropic).
+- Based on the
+  [HEIG-VD DAI course](https://github.com/heig-vd-dai-course/heig-vd-dai-course)
+  by L. Delafontaine and H. Louis, licensed
+  [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/).
+
+[^explicit-commands]: Explicit commands are commands that can be run in
+    a terminal to clone and build your application. They work as they
+    are, for a new user or developer, without any additional
+    information.
+
+[^explicit-error-messages]: Explicit error messages clearly explain what
+    went wrong and how to fix it. They are user-friendly and easy to
+    understand.

@@ -1,0 +1,403 @@
+---
+title: "SMTP & ncat"
+subtitle: "DAI · Chapter 07"
+---
+
+## Objectives
+
+- Follow an email from sender to mailbox: programs, protocols, ports.
+- Find the mail servers and policies of a domain with `dig`.
+- Tell the **envelope** from the **message**, and see why spoofing is
+  easy.
+- Use a mock server, and send an email by hand with `ncat`.
+- Read a small Java SMTP client.
+
+## Reminder: IP addresses
+
+- Each machine on the Internet has an **IP address**.
+- IPv4 (`193.134.223.20`): 32 bits, not enough for every device.
+- **NAT**: a router shares one public address between several
+  machines, like your home router.
+- **IPv6** (`2001:db8::1`): 128 bits, made to solve the shortage.
+
+## Reminder: names and the DNS
+
+- The **DNS** translates names into addresses (and more).
+
+```sh
+nslookup heig-vd.ch
+```
+
+```{.text .fragment}
+Non-authoritative answer:
+Name:   heig-vd.ch
+Address: 193.134.223.20
+```
+
+- Your browser does this lookup before it connects.
+
+## Reminder: ports
+
+- IP address = street address; **port** = apartment number: one
+  program on the machine. 16 bits, 0 to 65535, TCP and UDP separately.
+
+::: {style="font-size: 0.7em"}
+| Range | Examples |
+|---|---|
+| 0-1023, system | 21 FTP · 22 SSH · 25, 465, 587 SMTP · 53 DNS · 80, 443 HTTP(S) · 110, 995 POP3 · 143, 993 IMAP |
+| 1024-49151, registered | 3306 MySQL · 5432 PostgreSQL · 6379 Redis · 8080 HTTP · 25565 Minecraft |
+| 49152-65535, dynamic | Never registered: temporary connections, private services (51820 WireGuard) |
+: {tbl-colwidths="[28,72]"}
+:::
+
+## How an email travels
+
+```{mermaid}
+flowchart LR
+    B["Bob's MUA"] -- "SMTP, 587 or 465" --> MSA["Bob's server<br>(MSA, then MTA)"]
+    MSA -- "MX of gmail.com?" --> DNS[(DNS)]
+    MSA -- "SMTP, 25" --> MTA["Alice's server<br>(MTA, mailbox)"]
+    MTA -- "IMAP or POP3" --> A["Alice's MUA"]
+```
+
+## Who is who
+
+- **MUA**, Mail User Agent: the mail program of a person
+  (Thunderbird, Outlook, Gmail).
+- **MSA**, Mail Submission Agent: accepts the mails of its own users,
+  usually after login.
+- **MTA**, Mail Transfer Agent: carries mails from server to server, to
+  the domain of the recipient.
+- **Mailbox**: stores the mails until the MUA fetches them.
+- MSA and MTA are often the same server program, with two roles.
+
+## The commands at each step
+
+```{mermaid}
+sequenceDiagram
+    participant B as Bob's MUA
+    participant S1 as Bob's server
+    participant S2 as Alice's server
+    participant A as Alice's MUA
+    B->>S1: EHLO, MAIL FROM, RCPT TO
+    B->>S1: DATA, message, QUIT
+    Note over S1: stores, finds MX
+    S1->>S2: EHLO, MAIL FROM, RCPT TO
+    S1->>S2: DATA, message, QUIT
+    Note over S2: stores in mailbox
+    A->>S2: fetch (IMAP or POP3)
+```
+
+## SMTP sends, IMAP and POP3 read
+
+- **SMTP** pushes a mail one step further, up to the mailbox.
+- **POP3** downloads the mails, can delete them on the server.
+- **IMAP** keeps them on the server and **synchronizes** the devices:
+  read on the phone, read on the laptop.
+- A webmail is a MUA running on the server: your browser speaks HTTP,
+  the webmail often IMAP.
+
+## Ports
+
+::: {style="font-size: 0.8em"}
+| Protocol | Use | Plain text | TLS from the start |
+|---|---|---|---|
+| SMTP | Relay between MTAs | 25 | |
+| SMTP | Submission by a MUA | 587, then `STARTTLS` | 465 |
+| POP3 | Reading | 110 | 995 |
+| IMAP | Reading | 143 | 993 |
+:::
+
+- 587: clear text, then `STARTTLS` switches to TLS before anything
+  private. 465, 995, 993: TLS at once.
+- So ncat can talk to 25 and 587 only.
+
+## DNS records
+
+| Type | Gives |
+|---|---|
+| `A`, `AAAA` | An IPv4, IPv6 address |
+| `CNAME` | An alias |
+| `NS` | The DNS servers of the domain |
+| `MX` | The servers that receive the mail of the domain |
+| `TXT` | Free text, used for policies such as SPF |
+
+## Where does the mail of a domain go?
+
+```sh
+dig +short heig-vd.ch MX
+```
+
+```{.text .fragment}
+0 heigvd-ch01b.mail.protection.outlook.com.
+```
+
+- Microsoft's servers receive the mail of HEIG-VD.
+- `0`: the **preference**. With several MX records, the lowest number
+  is tried first.
+
+## Envelope and message
+
+:::: {.columns}
+::: {.column width="50%"}
+**Envelope**: SMTP commands, for the servers.
+
+- `MAIL FROM:<...>`: the return path, for error reports.
+- `RCPT TO:<...>`: one per recipient. Delivery follows these, never
+  `To:` or `Cc:`.
+:::
+::: {.column width="50%"}
+**Message**: after `DATA`, for the reader (RFC 5322).
+
+```text
+From: Alice <alice@example.com>
+To: Bob <bob@example.com>
+Subject: Hello from ncat
+
+Hi Bob,
+this mail was typed by hand.
+```
+
+Headers, an **empty line**, the body.
+:::
+::::
+
+## Nothing checks that they match
+
+- Servers deliver to the **envelope**, the MUA displays the
+  **headers**.
+- `From:` can show **any** address: **spoofing**.
+- SMTP checks neither `From:` nor `MAIL FROM`.
+
+## A policy against spoofing
+
+- SMTP of 1982: no login, no encryption, any server can claim any
+  domain.
+- **SPF**, added later: a `TXT` record in the DNS lists the IP
+  addresses allowed to send mail for the domain of `MAIL FROM`.
+- The receiving server checks it: accept, reject, or spam folder.
+- DKIM and DMARC complete it (*Go further*).
+
+## SPF of HEIG-VD
+
+::: {style="font-size: 0.75em"}
+```text
+v=spf1 ip4:193.134.218.124 ip4:145.232.233.54 ip4:185.144.39.35/32
+  ip4:185.144.39.39/32 include:spf.protection.outlook.com
+  include:spf.hefr.ch include:_spf.createsend.com
+  include:c2qslai37u.powerspf.com -all
+```
+:::
+
+- `ip4:`: addresses allowed to send.
+- `include:`: the addresses of another domain's SPF record too.
+- `-all`: every other address fails (`~all`: accept, mark as suspect).
+
+Spammers on your server: your IP on **blocklists**. Most companies
+and schools let Microsoft or Google run their mail.
+
+## Mock servers
+
+- Never test a mail program against a real server: a bug in a loop
+  sends thousands of mails to real people.
+- A **mock server** speaks the same protocol, delivers nothing, and
+  shows what it received.
+- **Mailpit**: SMTP on port 1025, web interface on 8025.
+
+```yaml
+services:
+  mailpit:
+    image: axllent/mailpit:v1.32
+    ports:
+      - 1025:1025
+      - 8025:8025
+```
+
+## Watching the server
+
+```sh
+docker compose logs -f
+```
+
+```{.text .fragment}
+mailpit-1 | ... msg="[smtpd] starting on [::]:1025 (no encryption)"
+mailpit-1 | ... msg="[smtpd] response (192.168.65.1) 503 5.5.1
+            Bad sequence of commands (MAIL required before RCPT)"
+```
+
+- `-f` follows the log as new lines come; `Ctrl` + `C` stops
+  following, Mailpit keeps running.
+- Mailpit logs each **error** it answers, not the mails it accepts
+  (those are in the web interface).
+
+## ncat
+
+Opens a TCP connection, sends what you type, prints what it receives.
+The protocol is you.
+
+```sh
+# Client
+ncat -C localhost 1025
+
+# Server: listen on 2525, print what the client sends
+ncat -l -C 2525
+```
+
+- `-C`: each line ends with `\r\n`, as SMTP requires.
+- Install: `sudo apt install ncat` (Ubuntu, WSL), `brew install nmap`
+  (macOS).
+- Alternatives: `nc`, `telnet` (check their CR LF option).
+
+## Sending an email by hand
+
+::: {style="font-size: 0.6em"}
+```text
+S: 220 a825881dcf8e Mailpit ESMTP Service ready
+C: EHLO my-laptop.local
+S: 250-a825881dcf8e greets my-laptop.local
+S: 250-SIZE 52428800
+S: 250-ENHANCEDSTATUSCODES
+S: 250-8BITMIME
+S: 250 SMTPUTF8
+C: MAIL FROM:<alice@example.com>
+S: 250 2.1.0 Ok
+C: RCPT TO:<bob@example.com>
+S: 250 2.1.5 Ok
+C: DATA
+S: 354 Start mail input; end with <CR><LF>.<CR><LF>
+C: From: Alice <alice@example.com>
+C: To: Bob <bob@example.com>
+C: Subject: Hello from ncat
+C:
+C: Hi Bob,
+C: this mail was typed by hand.
+C: .
+S: 250 2.0.0 Ok: queued as 0WN74Fza0O8ED2H17pjg9l
+C: QUIT
+S: 221 2.0.0 a825881dcf8e Mailpit ESMTP Service closing transmission channel
+```
+:::
+
+## The commands
+
+::: {style="font-size: 0.7em"}
+| Command | Meaning | Success |
+|---|---|---|
+| (connection) | The server speaks first | `220` |
+| `EHLO <name>` | Hello; the answer lists the extensions | `250`, several lines |
+| `MAIL FROM:<address>` | Starts a mail, gives the return path | `250` |
+| `RCPT TO:<address>` | One recipient; repeat for each | `250` |
+| `DATA` | The message follows | `354` |
+| message, then `.` | Ends with a line holding a single `.` | `250` |
+| `QUIT` | Goodbye; the server closes | `221` |
+:::
+
+## Reading the replies
+
+- **First digit**: `2` success, `3` go on, `4` try again later, `5`
+  permanent failure.
+- `250-` announces more lines; `250 ` is the last one.
+- `2.1.0`: enhanced status code, more detail.
+- Command in the wrong place: an error, the connection stays open
+  (and Mailpit's log shows it).
+
+::: {style="font-size: 0.8em"}
+```text
+C: RCPT TO:<bob@example.com>
+S: 503 5.5.1 Bad sequence of commands (MAIL required before RCPT)
+```
+:::
+
+## Why `-C` matters
+
+- Without `-C`, the terminal sends `\n` alone.
+- Mailpit accepts commands ending with `\n`...
+- ...but the end of the mail must be exactly `\r\n.\r\n`.
+- Without `-C`, the `.` is one more line of text: the server waits
+  until its timeout (5 minutes in Mailpit).
+
+## A Java SMTP client
+
+::: {style="font-size: 0.75em"}
+```java
+try (Socket socket = new Socket(host, port);
+    BufferedReader in = new BufferedReader(
+        new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8));
+    BufferedWriter out = new BufferedWriter(
+        new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8))) {
+
+  expect(in, 220);                  // the server speaks first
+  send(out, "EHLO my-laptop.local");
+  expect(in, 250);
+  send(out, "MAIL FROM:<alice@example.com>");
+  expect(in, 250);
+  // ...
+```
+:::
+
+- A `Socket` is a TCP connection with two streams. Around them: the
+  readers and writers of chapter 04.
+
+## `send` and `expect`
+
+::: {style="font-size: 0.75em"}
+```java
+private static void send(BufferedWriter out, String line) throws IOException {
+  out.write(line + "\r\n");
+  out.flush();
+}
+
+private static void expect(BufferedReader in, int code) throws IOException {
+  String line;
+  do {
+    line = in.readLine();
+    if (line == null) throw new IOException("The server closed the connection");
+  } while (line.length() > 3 && line.charAt(3) == '-');
+  if (!line.startsWith(code + "")) throw new IOException("Expected " + code + ", received: " + line);
+}
+```
+:::
+
+- `\r\n` written by hand: `newLine()` writes `\n` on Linux and macOS.
+- No `flush()`: both sides wait, until a timeout.
+- Read the **whole** reply, or every next answer is one step late.
+
+## Summary
+
+- MUA, MSA, MTA: SMTP to send (587/465, then 25), IMAP or POP3 to read.
+- `MX` says where the mail of a domain goes; SPF fights spoofing.
+- The **envelope** decides delivery, the **headers** what the reader
+  sees.
+- Test against a **mock server**, never a real one.
+- ncat: you are the protocol. `-C` for CR LF.
+
+# Questions?
+
+# Exercises
+
+## What will you do?
+
+In the chapter page, and `07-smtp-and-ncat` of the
+[code examples]({{< var examples-url >}}):
+
+1. Send an email to Mailpit by hand, and read its headers.
+2. Forget `-C`: see why CR LF matters.
+3. Be the server for the Java client.
+4. Improve the client.
+
+*Go further*: CC, Bcc, HTML and attachments; DKIM and DMARC; and more
+exercises.
+
+**Help each other, no need to rush!**
+
+## Credits
+
+::: {style="font-size: 0.7em"}
+- O. Tischhauser, with the help of
+  [Claude](https://claude.com) (Anthropic).
+- Based on the
+  [HEIG-VD DAI course](https://github.com/heig-vd-dai-course/heig-vd-dai-course)
+  by L. Delafontaine and H. Louis, licensed
+  [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/), as is
+  this deck, and on the DAI course of J. Ehrensberger.
+:::
